@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meridian wire fraud prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF1F3; --surface:#FFFFFF; --ink:#13232A; --muted:#5A6B72; --line:#D6DFE3; --soft:#F3F6F7;
+  --brand:#0E4A5A; --brand-ink:#FFFFFF; --gold:#C98B1E;
+  --ok:#2E7D32; --ok-bg:#E6F2E6; --warn:#946200; --warn-bg:#FFF3D6; --bad:#B3261E; --bad-bg:#FBE7E5;
+  --e-bg:#18242A; --e-surface:#22323A; --e-ink:#E4ECEF; --e-muted:#9BB0B8; --e-line:#34505A;
+  --d-bg:#F7F5EE; --d-ink:#3B3A33; --d-line:#D9D3BF;
+  --g:#86BC25; --a:#F2B620; --r:#E0533D; --focus:#2F6FDB;
+  color-scheme:light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0F171A; --surface:#172227; --ink:#E3ECEF; --muted:#9AAEB5; --line:#2C3D44; --soft:#1C2A30;
+  --brand:#5FB3C7; --brand-ink:#0F171A; --gold:#E3AE4B;
+  --ok:#7CCB80; --ok-bg:#1B3020; --warn:#F2C14E; --warn-bg:#3A2F12; --bad:#FF8A7D; --bad-bg:#3B1E1B;
+  --e-bg:#0A1114; --e-surface:#132026; --e-line:#28404A;
+  --d-bg:#1E1D18; --d-ink:#E6E2D3; --d-line:#3A382E; --focus:#7FA8FF; color-scheme:dark;}}
+:root[data-theme="dark"]{--paper:#0F171A; --surface:#172227; --ink:#E3ECEF; --muted:#9AAEB5; --line:#2C3D44; --soft:#1C2A30;
+  --brand:#5FB3C7; --brand-ink:#0F171A; --gold:#E3AE4B; --ok:#7CCB80; --ok-bg:#1B3020; --warn:#F2C14E; --warn-bg:#3A2F12; --bad:#FF8A7D; --bad-bg:#3B1E1B;
+  --e-bg:#0A1114; --e-surface:#132026; --e-line:#28404A; --d-bg:#1E1D18; --d-ink:#E6E2D3; --d-line:#3A382E; color-scheme:dark;}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:var(--paper);color:var(--ink);font-family:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums;display:flex;flex-direction:column}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+
+/* ---------- demo bar ---------- */
+.demobar{background:var(--d-bg);color:var(--d-ink);border-bottom:1px solid var(--d-line);padding:10px 16px;flex:none}
+.demorow{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap}
+.dtag{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.75}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--d-line);background:transparent;border-radius:999px;padding:3px 11px;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--d-ink);color:var(--d-bg);border-color:var(--d-ink)}
+.seg{display:inline-grid;grid-auto-flow:column;border:1px solid var(--d-line);border-radius:6px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:3px 10px;font-size:13px;font-weight:600;cursor:pointer;opacity:.75}
+.seg button[aria-pressed="true"]{background:var(--d-ink);color:var(--d-bg);opacity:1}
+.dlink{background:none;border:1px solid var(--d-line);border-radius:6px;padding:3px 10px;font-size:13px;font-weight:600;cursor:pointer}
+.preview{margin-left:auto;font-size:13px}
+.preview b{font-size:15px}
+.drawer{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 24px;padding:12px 0 4px;border-top:1px dashed var(--d-line);margin-top:10px}
+@media (max-width:1100px){.drawer{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.drawer{grid-template-columns:1fr}}
+.dh{font-size:12px;font-weight:800;opacity:.7;margin:6px 0 2px}
+.prow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:3px 0;font-size:13.5px}
+.prow label{flex:1}
+.prow input[type=number]{width:88px;padding:3px 6px;border:1px solid var(--d-line);border-radius:4px;background:transparent;text-align:right}
+.prow input[type=range]{width:110px;accent-color:var(--d-ink)}
+.prow output{width:36px;text-align:right;font-size:12.5px;opacity:.75}
+.sw{position:relative;width:34px;height:20px;flex:none}
+.sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.sw span{position:absolute;inset:0;border-radius:10px;background:var(--d-line)}
+.sw span::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--d-bg);transition:transform .15s}
+.sw input:checked+span{background:var(--r)}
+.sw input:checked+span::after{transform:translateX(14px)}
+.sw input:focus-visible+span{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---------- split ---------- */
+.mtabs{display:none}
+.split{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0}
+.pane{display:flex;flex-direction:column;min-height:0;min-width:0}
+.plabel{flex:none;display:flex;align-items:center;gap:8px;padding:7px 16px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.cust .plabel{background:var(--soft);color:var(--muted);border-bottom:1px solid var(--line)}
+.emp{background:var(--e-bg);color:var(--e-ink);border-left:1px solid var(--e-line)}
+.emp .plabel{background:var(--e-surface);color:var(--e-muted);border-bottom:1px solid var(--e-line)}
+.pscroll{flex:1;overflow-y:auto;min-height:0}
+@media (min-width:1101px){body{height:100vh;overflow:hidden}}
+@media (max-width:1100px){
+  .split{grid-template-columns:1fr}
+  .mtabs{display:grid;grid-template-columns:1fr 1fr;position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+  .mtabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px;font-weight:700;cursor:pointer;color:var(--muted)}
+  .mtabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+  .mtabs .badge{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--r);margin-left:6px;vertical-align:middle}
+  .pane[data-hide-mobile]{display:none}
+  .emp{border-left:0}
+}
+
+/* ---------- customer (bank) ---------- */
+.bhead{background:var(--brand);color:var(--brand-ink)}
+.bhead .in{padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px}
+.bnav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.bnav span{padding:4px 9px;border-radius:6px;font-weight:600;font-size:13.5px;opacity:.8}
+.bnav span.on{background:rgba(255,255,255,.16);opacity:1}
+.bmain{max-width:720px;margin:0 auto;padding:22px 20px 48px}
+.crumb{color:var(--muted);font-size:14px;margin-bottom:4px}
+.bmain h1{font-size:26px;font-weight:800;margin:0 0 4px;letter-spacing:-.015em}
+.sub{color:var(--muted);margin:0 0 18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px}
+.field{display:grid;gap:6px;margin-bottom:14px}
+.field label{font-weight:600;font-size:14px}
+.field .hint{font-size:13px;color:var(--muted)}
+.field input,.field select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+@media (max-width:560px){.cols{grid-template-columns:1fr}}
+.money{position:relative}
+.money span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.money input{padding-left:24px;font-size:19px;font-weight:700}
+.newpayee{border-top:1px dashed var(--line);padding-top:14px;margin-top:2px}
+.newpayee h3{margin:0 0 10px;font-size:15px}
+.actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:6px;flex-wrap:wrap}
+.btn{border:1px solid var(--brand);background:var(--brand);color:var(--brand-ink);padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer}
+.btn.sec{background:transparent;color:var(--brand)}
+.link{background:none;border:0;color:var(--brand);font-weight:600;cursor:pointer;padding:6px 4px}
+dl.sum{display:grid;grid-template-columns:150px 1fr;gap:8px 14px;margin:0}
+@media (max-width:520px){dl.sum{grid-template-columns:1fr;gap:2px}dl.sum dd{margin-bottom:8px}}
+dl.sum dt{color:var(--muted)} dl.sum dd{margin:0;font-weight:600}
+.total{font-size:21px;font-weight:800}
+.notice{display:flex;gap:12px;align-items:flex-start;border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.notice.ok{background:var(--ok-bg);color:var(--ok)} .notice.warn{background:var(--warn-bg);color:var(--warn)} .notice.bad{background:var(--bad-bg);color:var(--bad)}
+.notice h2{margin:0;font-size:18px} .notice p{margin:2px 0 0;color:var(--ink)}
+.notice svg{flex:none;margin-top:2px}
+.screen{text-align:center;padding:48px 20px}
+.spin{width:40px;height:40px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--brand);margin:0 auto 16px;animation:sp .9s linear infinite}
+.spin.sm{width:16px;height:16px;border-width:2px;margin:0;display:inline-block;vertical-align:-3px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.stepper{list-style:none;padding:0;margin:0}
+.stepper li{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:0 0 18px;position:relative}
+.stepper li:not(:last-child)::after{content:"";position:absolute;left:13.5px;top:30px;bottom:4px;width:1px;background:var(--line)}
+.dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+.stepper li.done .dot{background:var(--ok);color:#fff;border-color:var(--ok)}
+.stepper li.fail .dot{background:var(--bad);color:#fff;border-color:var(--bad)}
+.stepper li.now .dot{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.stepper h3{margin:2px 0 2px;font-size:15.5px}
+.stepper p{margin:0 0 8px;color:var(--muted)}
+.stepper li.wait h3{color:var(--muted)}
+.waiting{color:var(--brand);font-weight:600;font-size:14px}
+.demo{display:inline-block;font-size:11.5px;font-weight:700;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:0 6px;margin-right:6px;vertical-align:middle}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inline-input{display:flex;gap:8px;flex-wrap:wrap}
+.inline-input input{flex:1;min-width:180px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.err{color:var(--bad);font-size:14px;margin:6px 0 0}
+.vbanner{display:flex;gap:10px;align-items:center;background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:9px 13px;margin:-6px 0 14px;font-weight:600;font-size:14px}
+
+/* ---------- employee ---------- */
+.emain{padding:18px 18px 40px}
+.ehead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.ehead h2{margin:0;font-size:18px}
+.ewho{font-size:13px;color:var(--e-muted);display:flex;gap:8px;align-items:center}
+.ebtn{border:1px solid var(--e-line);background:transparent;color:var(--e-ink);border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:600;font-size:13.5px}
+.ebtn.pri{background:var(--g);border-color:var(--g);color:#14200A}
+.ebtn.bad{border-color:var(--r);color:var(--r)}
+.ebtn.sm{padding:2px 9px;font-size:12.5px;font-weight:500}
+.ebox{background:var(--e-surface);border:1px solid var(--e-line);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.ebox h3{margin:0 0 8px;font-size:13px;font-weight:700;color:var(--e-muted);text-transform:uppercase;letter-spacing:.04em}
+.esmall{font-size:13px;color:var(--e-muted)}
+.gate{max-width:360px;margin:30px auto}
+.gate label{display:block;font-size:13px;font-weight:600;color:var(--e-muted);margin:10px 0 4px}
+.gate input{width:100%;padding:8px 10px;border:1px solid var(--e-line);border-radius:6px;background:var(--e-bg);color:var(--e-ink)}
+.gate .ebtn{width:100%;margin-top:14px;padding:9px}
+.gerr{color:var(--r);font-size:13px;margin:8px 0 0}
+.empty{text-align:center;padding:34px 16px;color:var(--e-muted);border:1px dashed var(--e-line);border-radius:8px}
+.casehead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.caseid{font-weight:800;font-size:16px}
+.pill{display:inline-block;padding:1px 10px;border-radius:999px;font-size:12.5px;font-weight:700;border:1px solid currentColor;white-space:nowrap}
+.st-sent{color:var(--g)} .st-wait{color:var(--a)} .st-act{color:#14200A;background:var(--a);border-color:var(--a)} .st-blocked{color:var(--r)} .st-cancel{color:var(--e-muted)} .st-scoring{color:var(--e-muted)}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:4px 12px;font-size:14px;margin-top:10px}
+.kv dt{color:var(--e-muted)} .kv dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
+.amt{font-size:24px;font-weight:800}
+.scorewrap{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.scorewrap b{font-size:46px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.lane{font-weight:800;font-size:17px}
+.lane.release{color:var(--g)} .lane.confirm{color:var(--a)} .lane.hold{color:var(--r)}
+.rail{position:relative;height:26px;margin:12px 0 2px}
+.rail .bands{position:absolute;left:0;right:0;top:9px;height:9px;border-radius:3px;overflow:hidden;display:flex}
+.rail .bands i{display:block;height:100%}
+.rail .mk{position:absolute;top:0;width:2px;height:26px;background:var(--e-ink);transform:translateX(-1px)}
+.policy{font-size:13px;color:var(--a);margin-top:6px}
+.reasons{list-style:none;margin:6px 0 0;padding:0;font-size:14px}
+.reasons li{padding:6px 0;border-top:1px solid var(--e-line);display:flex;gap:8px}
+.reasons li:first-child{border-top:0}
+.reasons li span:first-child{color:var(--r);font-weight:800}
+.action{border:1px solid var(--a);background:color-mix(in srgb,var(--a) 10%,transparent)}
+.action h3{color:var(--a)}
+.action p{margin:0 0 10px;font-size:14px}
+.tl{list-style:none;margin:0;padding:0;font-size:13.5px}
+.tl li{display:grid;grid-template-columns:96px 1fr;gap:8px;padding:5px 0;border-top:1px solid var(--e-line)}
+.tl li:first-child{border-top:0}
+.tl time{color:var(--e-muted);white-space:nowrap}
+.tl .k-bad{color:var(--r)} .tl .k-ok{color:var(--g)} .tl .k-warn{color:var(--a)}
+.sigs{display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:13.5px;margin-top:8px}
+.sigs .hot{color:var(--r);font-weight:700}
+details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--e-muted);text-transform:uppercase;letter-spacing:.04em}
+pre.json{background:var(--e-bg);border:1px solid var(--e-line);border-radius:6px;padding:10px;font-size:11.5px;overflow-x:auto;margin:8px 0 0;max-height:260px}
+.hist{width:100%;border-collapse:collapse;font-size:13.5px}
+.hist td{padding:7px 6px;border-top:1px solid var(--e-line);vertical-align:top}
+.hist tr:first-child td{border-top:0}
+.hist tr{cursor:pointer}
+.hist tr[aria-current="true"] td{background:var(--e-bg)}
+.hist td.r{text-align:right;white-space:nowrap}
+.nocopy{-webkit-user-select:none;user-select:none}
+.nocopy input{-webkit-user-select:text;user-select:text}
+@media print{.emp{display:none!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="demobar" aria-label="Demo controls">
+  <div class="demorow">
+    <span class="dtag">Demo controls</span>
+    <div class="chips" id="scen" role="group" aria-label="Scenario"></div>
+    <div class="seg" role="group" aria-label="Request channel"><button type="button" id="c-online" aria-pressed="true">Online</button><button type="button" id="c-voice" aria-pressed="false">Voice call</button></div>
+    <button type="button" class="dlink" id="more" aria-expanded="false" aria-controls="drawer">Adjust signals</button>
+    <span class="preview" id="preview"></span>
+  </div>
+  <div class="drawer" id="drawer" hidden>
+    <div>
+      <div class="dh">Score</div>
+      <div class="prow"><label>Source</label><span class="seg" role="group" aria-label="Score source"><button type="button" id="m-model" aria-pressed="true">Model</button><button type="button" id="m-manual" aria-pressed="false">Manual</button></span></div>
+      <div class="prow" id="manual-row" hidden><label for="s-manual">Forced score</label><input id="s-manual" type="range" min="0" max="1" step=".01" value=".25"><output id="o-manual">0.25</output></div>
+      <div class="prow"><label for="th-rel">Release below</label><input id="th-rel" type="number" min="0" max="1" step=".01" value="0.05"></div>
+      <div class="prow"><label for="th-hold">Hold at or above</label><input id="th-hold" type="number" min="0" max="1" step=".01" value="0.40"></div>
+    </div>
+    <div>
+      <div class="dh">Customer history</div>
+      <div class="prow"><label for="g-usual">Usual wire ($)</label><input id="g-usual" type="number" min="1" step="100"></div>
+      <div class="prow"><label for="g-off">Outside usual hours</label><span class="sw"><input id="g-off" type="checkbox"><span></span></span></div>
+      <div class="prow"><label for="g-debt">Debt-to-income</label><input id="g-debt" type="range" min="0" max="1" step=".01"><output id="o-debt"></output></div>
+      <div class="dh">External</div>
+      <div class="prow"><label for="g-sim">SIM swap, 7 days</label><span class="sw"><input id="g-sim" type="checkbox"><span></span></span></div>
+      <div class="prow"><label for="g-mule">Payee on mule list</label><span class="sw"><input id="g-mule" type="checkbox"><span></span></span></div>
+    </div>
+    <div>
+      <div class="dh">Device and behavior</div>
+      <div class="prow"><label for="g-newip">New device or IP</label><span class="sw"><input id="g-newip" type="checkbox"><span></span></span></div>
+      <div class="prow"><label for="g-typing">Typing mismatch</label><input id="g-typing" type="range" min="0" max="1" step=".01"><output id="o-typing"></output></div>
+      <div class="prow"><label for="g-remote">Remote-access tool</label><span class="sw"><input id="g-remote" type="checkbox"><span></span></span></div>
+      <div class="dh">Hold lane</div>
+      <div class="prow"><label for="g-contact">Trusted contact changed, 2 weeks</label><span class="sw"><input id="g-contact" type="checkbox"><span></span></span></div>
+    </div>
+    <div>
+      <div class="dh">Beneficiary (set by payee)</div>
+      <div class="prow"><label for="g-age">Account age (days)</label><input id="g-age" type="number" min="1" step="1"></div>
+      <div class="prow"><label for="g-senders">Senders, 30 days</label><input id="g-senders" type="number" min="1" step="1"></div>
+      <div class="prow"><label for="g-bankchg">Bank details changed</label><span class="sw"><input id="g-bankchg" type="checkbox"><span></span></span></div>
+    </div>
+  </div>
+</div>
+
+<div class="mtabs" role="tablist" aria-label="Views">
+  <button role="tab" id="tab-c" aria-selected="true">Customer view</button>
+  <button role="tab" id="tab-e" aria-selected="false">Employee view<span class="badge" id="badge" hidden></span></button>
+</div>
+
+<div class="split">
+  <section class="pane cust" id="pane-c" aria-label="Customer view">
+    <div class="plabel">Customer view: Meridian online banking</div>
+    <div class="pscroll">
+      <header class="bhead"><div class="in">
+        <div class="logo"><svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 19 L11 9 L14 16 L17 9 L21 19" fill="none" stroke="var(--gold)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg>Meridian Community Bank</div>
+        <nav class="bnav" aria-label="Banking"><span>Accounts</span><span class="on">Wires</span><span>Statements</span></nav>
+      </div></header>
+      <main class="bmain" id="app"></main>
+    </div>
+  </section>
+
+  <section class="pane emp" id="pane-e" aria-label="Employee view" data-hide-mobile>
+    <div class="plabel">Employee view: Fraud operations console</div>
+    <div class="pscroll nocopy" id="emp"></div>
+  </section>
+</div>
+
+<script src="model_weights.js"></script>
+<script src="engine.js"></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const usd=n=>'$'+(+n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const usd0=n=>'$'+Math.round(+n).toLocaleString('en-US');
+const today=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+const now=()=>new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+const LN={release:'Release',confirm:'Confirm',hold:'Hold'};
+// Scoring mode: in the browser with trained weights (default), or via the API with ?api=http://localhost:8000
+const API=(new URLSearchParams(location.search).get('api')||'').replace(/\/+$/,'');
+const MODEL={version:WireRisk.VERSION,auc:WireRisk.METRICS&&WireRisk.METRICS.auc,labels:0,busy:false};
+async function apiPost(path,body){const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+  if(!r.ok) throw new Error(`${path} returned ${r.status}`); return r.json();}
+
+const CUSTOMER='Prairie Ridge Farms';
+const ACCOUNTS=[{id:'op',name:'Business Operating',mask:'4821',bal:284310.55},{id:'pay',name:'Payroll',mask:'7730',bal:61204.18}];
+const PAYEES=[
+  {id:'midstate',name:'Midstate Steel Supply',bank:'First Merchants Bank',mask:'3391',country:'United States',age:1460,senders:2,bankchg:false,first:false,last:'Oct 2, 2026'},
+  {id:'granite',name:'Granite Point Consulting',bank:'Metro Credit Union',mask:'9914',country:'United States',age:21,senders:3,bankchg:true,first:false,last:'Sep 18, 2026',note:'Bank details updated Oct 28'},
+  {id:'heartland',name:'Heartland Title & Escrow',bank:'Old National Bank',mask:'0187',country:'United States',age:2900,senders:18,bankchg:false,first:true,last:null},
+];
+const COUNTRIES=['United States','Canada','Mexico','United Kingdom','Hong Kong','United Arab Emirates','Nigeria'];
+const CLEAN={usual:9000,off:false,debt:.30,newip:false,typing:.12,remote:false,sim:false,mule:false,contact:false,newAge:12,newSenders:2};
+const S={scen:0,wire:{from:'op',payee:'midstate',amount:8400,memo:'Invoice 22817',np:{name:'',bank:'',routing:'',account:'',country:'United States'}},
+  sig:Object.assign({},CLEAN),ben:{age:1460,senders:2,bankchg:false},mode:'model',manual:.25,th:{release:.05,hold:.40},channel:'online',
+  step:'form',cur:null,cases:[],sel:null,emp:null,seq:1041};
+const SCEN=[
+  {n:'Routine payment',w:{payee:'midstate',amount:8400,memo:'Invoice 22817'},s:{}},
+  {n:'Vendor email compromise',w:{payee:'granite',amount:46500,memo:'Q4 retainer, updated banking'},s:{}},
+  {n:'Coached by deepfake call',w:{payee:'new',amount:85000,memo:'Urgent equipment deposit',np:{name:'Orion Trade Holdings',bank:'Coastline National Bank',routing:'071000013',account:'5550012231',country:'United States'}},s:{off:true,remote:true,typing:.34,debt:.35,newAge:12,newSenders:2}},
+  {n:'SIM-swap takeover',w:{payee:'new',amount:22000,memo:'Supplier payment',np:{name:'Apex Global Sourcing',bank:'Harbour Commercial Bank',routing:'026009593',account:'8812004417',country:'Hong Kong'}},s:{off:true,newip:true,sim:true,typing:.62,newAge:45,newSenders:1}},
+  {n:'Home closing',w:{payee:'heartland',amount:96000,memo:'Closing, 412 Orchard Ln'},s:{}},
+  {n:'Requested by phone',w:{payee:'midstate',amount:8400,memo:'Invoice 22904'},s:{},ch:'voice'},
+];
+
+// ----- engine input -----
+function payee(){return S.wire.payee==='new'?null:PAYEES.find(p=>p.id===S.wire.payee);}
+function payeeName(){const p=payee();return p?p.name:(S.wire.np.name||'New payee');}
+function country(){const p=payee();return p?p.country:S.wire.np.country;}
+function acct(){return ACCOUNTS.find(a=>a.id===S.wire.from);}
+function syncBen(){const p=payee(); S.ben=p?{age:p.age,senders:p.senders,bankchg:p.bankchg}:{age:S.sig.newAge,senders:S.sig.newSenders,bankchg:false};}
+function tx(){const p=payee();
+  return {amount:+S.wire.amount||0,usualAmount:S.sig.usual,outsideHours:S.sig.off,debtToIncome:S.sig.debt,newDevice:S.sig.newip,typingMismatch:S.sig.typing,
+    remoteAccess:S.sig.remote,simSwap7d:S.sig.sim,muleListHit:S.sig.mule,beneficiaryAgeDays:S.ben.age,bankDetailsChanged30d:S.ben.bankchg,
+    highRiskDestination:country()!=='United States',firstTimePayee:p?p.first:true,beneficiarySenders30d:S.ben.senders,channel:S.channel};}
+function opts(){return {thresholds:S.th,override:S.mode==='manual'?S.manual:undefined};}
+
+// ----- demo controls -----
+function renderPreview(){const r=WireRisk.score(tx(),opts());
+  $('preview').innerHTML=`If sent now: <b>${r.score<.01?r.score.toFixed(3):r.score.toFixed(2)}</b> ${LN[r.lane]}${r.policy?' (voice policy)':''} <span style="opacity:.7">(model ${esc(MODEL.version)}, ${API?'scoring via API':'scoring in browser'})</span>`;}
+function fillSignals(){
+  $('g-usual').value=S.sig.usual; $('g-off').checked=S.sig.off; $('g-debt').value=S.sig.debt; $('o-debt').textContent=Math.round(S.sig.debt*100)+'%';
+  $('g-newip').checked=S.sig.newip; $('g-typing').value=S.sig.typing; $('o-typing').textContent=(+S.sig.typing).toFixed(2);
+  $('g-remote').checked=S.sig.remote; $('g-sim').checked=S.sig.sim; $('g-mule').checked=S.sig.mule; $('g-contact').checked=S.sig.contact;
+  $('g-age').value=S.ben.age; $('g-senders').value=S.ben.senders; $('g-bankchg').checked=S.ben.bankchg;}
+const clamp01=v=>Math.max(0,Math.min(1,+v||0));
+function clearScen(){S.scen=-1; document.querySelectorAll('#scen .chip').forEach(c=>c.setAttribute('aria-pressed','false'));}
+function setChannel(ch,silent){S.channel=ch; $('c-online').setAttribute('aria-pressed',ch==='online'); $('c-voice').setAttribute('aria-pressed',ch==='voice');
+  if(!silent){clearScen(); if(S.step==='form'||S.step==='review') renderCust(); renderPreview();}}
+function bindControls(){
+  const on=(id,fn)=>$(id).addEventListener('input',e=>{fn(e.target); clearScen(); fillSignals(); renderPreview();});
+  on('g-usual',t=>S.sig.usual=Math.max(1,+t.value||1)); on('g-off',t=>S.sig.off=t.checked); on('g-debt',t=>S.sig.debt=+t.value);
+  on('g-newip',t=>S.sig.newip=t.checked); on('g-typing',t=>S.sig.typing=+t.value); on('g-remote',t=>S.sig.remote=t.checked);
+  on('g-sim',t=>S.sig.sim=t.checked); on('g-mule',t=>S.sig.mule=t.checked); on('g-contact',t=>S.sig.contact=t.checked);
+  on('g-age',t=>{S.ben.age=Math.max(1,+t.value||1); if(!payee())S.sig.newAge=S.ben.age;});
+  on('g-senders',t=>{S.ben.senders=Math.max(1,+t.value||1); if(!payee())S.sig.newSenders=S.ben.senders;});
+  on('g-bankchg',t=>S.ben.bankchg=t.checked);
+  const mode=m=>{S.mode=m; $('m-model').setAttribute('aria-pressed',m==='model'); $('m-manual').setAttribute('aria-pressed',m==='manual'); $('manual-row').hidden=m!=='manual'; renderPreview();};
+  $('m-model').onclick=()=>mode('model'); $('m-manual').onclick=()=>mode('manual');
+  $('s-manual').addEventListener('input',e=>{S.manual=+e.target.value; $('o-manual').textContent=S.manual.toFixed(2); renderPreview();});
+  const th=()=>{S.th={release:clamp01($('th-rel').value),hold:clamp01($('th-hold').value)}; renderPreview();};
+  $('th-rel').addEventListener('input',th); $('th-hold').addEventListener('input',th);
+  $('c-online').onclick=()=>setChannel('online'); $('c-voice').onclick=()=>setChannel('voice');
+  $('more').onclick=()=>{const h=!$('drawer').hidden; $('drawer').hidden=h; $('more').setAttribute('aria-expanded',!h); $('more').textContent=h?'Adjust signals':'Hide signals';};
+  $('scen').innerHTML=SCEN.map((s,i)=>`<button type="button" class="chip" data-i="${i}" aria-pressed="${i===S.scen}">${s.n}</button>`).join('');
+  $('scen').addEventListener('click',e=>{const b=e.target.closest('.chip'); if(b) applyScen(+b.dataset.i);});
+}
+function applyScen(i){const sc=SCEN[i]; S.scen=i;
+  S.wire=Object.assign({from:'op'},JSON.parse(JSON.stringify(sc.w))); if(!S.wire.np) S.wire.np={name:'',bank:'',routing:'',account:'',country:'United States'};
+  S.sig=Object.assign({},CLEAN,sc.s); syncBen(); setChannel(sc.ch||'online',true); S.step='form'; S.cur=null;
+  document.querySelectorAll('#scen .chip').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.i===i));
+  fillSignals(); renderPreview(); renderCust(); showPane('c');}
+
+// ----- cases (shared between the two views) -----
+function ev(c,msg,kind){c.events.push({t:now(),msg,kind:kind||''});}
+function newCase(){
+  const p=payee(), input=tx(), o=opts();
+  const c={id:'W-'+(S.seq++),at:now(),input,result:null,record:{input,options:o,result:null},
+    w:{customer:CUSTOMER,from:`${acct().name} ••${acct().mask}`,payee:payeeName(),bank:p?p.bank:(S.wire.np.bank||'Not given'),mask:p?p.mask:S.wire.np.account.slice(-4),
+       country:country(),amount:+S.wire.amount,memo:S.wire.memo,channel:S.channel,contactChanged:S.sig.contact,newDevice:S.sig.newip},
+    status:'scoring',lane:null,res:[],attempts:0,events:[]};
+  ev(c,S.channel==='voice'?'Wire entered by a banker during a phone call':'Wire submitted in online banking');
+  S.cases.unshift(c); S.cur=c; S.sel=c.id; return c;}
+async function scoreWire(c){
+  if(!API) return WireRisk.score(c.input,c.record.options);
+  return apiPost('/score',{wire:c.input,thresholds:c.record.options.thresholds,override:c.record.options.override??null,caseId:c.id});}
+function scoreCase(c){
+  ev(c,`Scored ${c.result.score<.01?c.result.score.toFixed(3):c.result.score.toFixed(2)} by model ${c.result.modelVersion}${c.result.overridden?' (score set manually)':''}`);
+  if(c.result.policy) ev(c,`Voice policy: routed to Confirm (score alone said ${LN[c.result.scoreLane]})`,'k-warn');
+  if(c.lane==='release'){c.status='sent'; c.lane='release'; ev(c,'Released automatically','k-ok'); sendFed(c);}
+  else if(c.lane==='confirm'){c.status='cust'; ev(c,`Routed to Confirm. ${c.w.newDevice||c.result.policy?'Passkey request pushed to verified iPhone':'Customer asked for a passkey'}`,'k-warn');}
+  else {c.status='cust'; ev(c,'Wire held. Customer asked to verify identity with Okta','k-bad');}
+}
+function toHold(c,why){c.lane='hold'; c.res=[]; c.status='cust'; ev(c,`${why}. Moved to Hold; customer asked to verify with Okta`,'k-bad');}
+function sendFed(c){c.status='sent'; c.conf='MCB'+String(Math.floor(1e7+Math.random()*9e7));
+  c.imad=new Date().toISOString().slice(0,10).replace(/-/g,'')+'B1QGC08C'+String(Math.floor(Math.random()*1e6)).padStart(6,'0');
+  ev(c,`Sent via Fedwire, ref ${c.imad}`,'k-ok');}
+function block(c,why){c.status='blocked'; ev(c,`${why}. Wire blocked; customer told to send in person at a branch`,'k-bad');}
+
+// ----- customer view -----
+const ICON={
+  ok:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warn:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 18H2z" fill="currentColor"/><path d="M12 9v5M12 17h.01" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  bad:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  lock:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="12" rx="2" fill="currentColor"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="2.2" fill="none"/></svg>',
+  phone:'<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1z" fill="currentColor"/></svg>'
+};
+function voiceBanner(){return S.channel==='voice'?`<div class="vbanner">${ICON.phone} Phone request: a banker is entering this wire during a call with the customer.</div>`:'';}
+function payeeHint(){const p=payee(); if(!p) return 'You’ll confirm this payee before the wire is sent.'; return p.note?esc(p.note):p.last?`Last wire ${p.last}`:'No wires sent to this payee yet';}
+function renderCust(){
+  const app=$('app'), v=S.step;
+  if(v==='form') app.innerHTML=formView();
+  else if(v==='review') app.innerHTML=reviewView();
+  else if(v==='screening') app.innerHTML=`<div class="card screen"><div class="spin" role="status" aria-label="Checking"></div><h2 style="margin:0 0 4px">Securing your wire</h2><p class="sub" style="margin:0">Running our standard security check.</p></div>`;
+  else app.innerHTML=outcomeView(S.cur);
+  if(v==='form') bindForm();
+}
+function formView(){const w=S.wire,isNew=w.payee==='new';
+  return `<div class="crumb">Wires</div><h1>Send a wire</h1><p class="sub">Domestic wires sent before 4:00 p.m. CT arrive the same business day.</p>${voiceBanner()}
+  <div class="card"><form id="wf" novalidate>
+    <div class="cols">
+      <div class="field"><label for="w-from">From</label><select id="w-from">${ACCOUNTS.map(a=>`<option value="${a.id}" ${a.id===w.from?'selected':''}>${a.name} ••${a.mask} (${usd(a.bal)})</option>`).join('')}</select></div>
+      <div class="field"><label for="w-payee">To</label><select id="w-payee">${PAYEES.map(p=>`<option value="${p.id}" ${p.id===w.payee?'selected':''}>${esc(p.name)} ••${p.mask}</option>`).join('')}<option value="new" ${isNew?'selected':''}>Add a new payee…</option></select><span class="hint" id="w-payee-hint">${payeeHint()}</span></div>
+    </div>
+    <div class="newpayee" id="np" ${isNew?'':'hidden'}><h3>New payee</h3><div class="cols">
+      <div class="field"><label for="np-name">Payee name</label><input id="np-name" value="${esc(w.np.name)}" autocomplete="off"></div>
+      <div class="field"><label for="np-bank">Bank name</label><input id="np-bank" value="${esc(w.np.bank)}" autocomplete="off"></div>
+      <div class="field"><label for="np-routing">Routing number</label><input id="np-routing" inputmode="numeric" maxlength="9" value="${esc(w.np.routing)}" autocomplete="off"></div>
+      <div class="field"><label for="np-account">Account number</label><input id="np-account" inputmode="numeric" value="${esc(w.np.account)}" autocomplete="off"></div>
+      <div class="field"><label for="np-country">Bank country</label><select id="np-country">${COUNTRIES.map(c=>`<option ${c===w.np.country?'selected':''}>${c}</option>`).join('')}</select></div>
+    </div></div>
+    <div class="cols">
+      <div class="field"><label for="w-amount">Amount</label><div class="money"><span>$</span><input id="w-amount" inputmode="decimal" value="${w.amount}"></div></div>
+      <div class="field"><label for="w-date">Send on</label><input id="w-date" value="Today, ${today}" readonly></div>
+    </div>
+    <div class="field"><label for="w-memo">Message to payee</label><input id="w-memo" value="${esc(w.memo)}" maxlength="140"></div>
+    <p class="err" id="w-err" hidden></p>
+    <div class="actions"><button type="submit" class="btn">Review wire</button></div>
+  </form></div>`;}
+function bindForm(){const w=S.wire;
+  $('w-from').onchange=e=>{w.from=e.target.value;};
+  $('w-payee').onchange=e=>{w.payee=e.target.value; $('np').hidden=w.payee!=='new'; $('w-payee-hint').textContent=payeeHint(); syncBen(); fillSignals(); clearScen(); renderPreview();};
+  $('w-amount').oninput=e=>{w.amount=+String(e.target.value).replace(/[^0-9.]/g,'')||0; clearScen(); renderPreview();};
+  $('w-memo').oninput=e=>{w.memo=e.target.value;};
+  ['name','bank','routing','account'].forEach(k=>$('np-'+k).oninput=e=>{w.np[k]=e.target.value;});
+  $('np-country').onchange=e=>{w.np.country=e.target.value; clearScen(); renderPreview();};
+  $('wf').onsubmit=e=>{e.preventDefault(); const er=validate(); if(er){$('w-err').hidden=false;$('w-err').textContent=er;return;} S.step='review'; renderCust();};}
+function validate(){const w=S.wire;
+  if(!(w.amount>0)) return 'Enter an amount greater than $0.';
+  if(w.amount>acct().bal) return `That’s more than the ${usd(acct().bal)} available in ${acct().name}.`;
+  if(w.payee==='new'){ if(!w.np.name.trim()) return 'Enter the payee’s name as it appears on their bank account.';
+    if(!/^\d{9}$/.test(w.np.routing)) return 'Routing numbers are 9 digits.'; if(!/^\d{4,17}$/.test(w.np.account)) return 'Enter the payee’s account number (digits only).';}
+  return '';}
+function reviewView(){const w=S.wire,p=payee(),fee=25;
+  return `<div class="crumb">Wires / Send a wire</div><h1>Review your wire</h1><p class="sub">Wires can’t be reversed once sent. Check every detail.</p>${voiceBanner()}
+  <div class="card"><dl class="sum">
+    <dt>From</dt><dd>${acct().name} ••${acct().mask}</dd><dt>To</dt><dd>${esc(payeeName())}</dd>
+    <dt>Bank</dt><dd>${esc(p?p.bank:w.np.bank||'Not given')} ••${esc(p?p.mask:(w.np.account.slice(-4)||'----'))}${country()!=='United States'?` (${esc(country())})`:''}</dd>
+    <dt>Send on</dt><dd>Today, ${today}</dd><dt>Message</dt><dd>${esc(w.memo||'None')}</dd>
+    <dt>Amount</dt><dd>${usd(w.amount)}</dd><dt>Wire fee</dt><dd>${usd(fee)}</dd><dt>Total</dt><dd class="total">${usd(+w.amount+fee)}</dd>
+  </dl><div class="actions"><button class="link" data-act="edit">Edit</button><button class="btn" data-act="send">Send wire</button></div></div>`;}
+function cls(i,c){const r=c.res;return r[i]==='ok'?'done':r[i]==='fail'?'fail':i===r.length?'now':'wait';}
+function outcomeView(c){const nm=esc(c.w.payee), amt=usd(c.w.amount);
+  if(c.status==='sent') return `<div class="notice ok">${ICON.ok}<div><h2>Wire sent</h2><p>${amt} to ${nm} is on its way and should arrive today.</p></div></div>
+    <div class="card"><dl class="sum"><dt>Confirmation</dt><dd class="mono">${c.conf}</dd><dt>Fedwire reference</dt><dd class="mono">${c.imad}</dd><dt>From</dt><dd>${esc(c.w.from)}</dd></dl>
+    <div class="actions"><button class="btn sec" data-act="new">Send another wire</button></div></div>`;
+  if(c.status==='blocked') return `<div class="notice bad">${ICON.bad}<div><h2>We couldn’t send this wire online</h2><p>We weren’t able to confirm it was you, so ${amt} to ${nm} has not been sent and no money has left your account.</p></div></div>
+    <div class="card"><h3 style="margin:0 0 6px">To send it, visit a branch</h3><p style="margin:0 0 10px;color:var(--muted)">Bring a photo ID. A banker will verify you in person and send the wire. Nearest branch: Meridian Downtown, 120 N Meridian St, Indianapolis.</p>
+    <p style="margin:0;color:var(--muted)">If you didn’t start this wire, call us now at (317) 555-0142.</p><div class="actions"><button class="btn sec" data-act="new">Back to wires</button></div></div>`;
+  if(c.status==='error') return `<div class="notice warn">${ICON.warn}<div><h2>We couldn’t finish your wire</h2><p>Our security check is unavailable right now, so nothing was sent. Please try again in a few minutes.</p></div></div><div class="actions"><button class="btn sec" data-act="new">Back to wires</button></div>`;
+  if(c.status==='cancelled') return `<div class="notice warn">${ICON.warn}<div><h2>Wire cancelled</h2><p>Nothing was sent. If someone asked you to make this payment, call us at (317) 555-0142 before trying again.</p></div></div><div class="actions"><button class="btn sec" data-act="new">Back to wires</button></div>`;
+  return c.lane==='confirm'?confirmView(c):holdView(c);}
+function confirmView(c){const voice=!!c.result.policy, dev=c.w.newDevice||voice, cur=c.res.length;
+  return `<div class="notice warn">${ICON.lock}<div><h2>Confirm it’s you</h2><p>${voice?'Wires requested by phone are always confirmed in the Meridian app. We never accept a voice on a call as proof of identity.':'For your protection, this wire needs two quick checks before we send it.'}</p></div></div>
+  <div class="card"><ol class="stepper">
+    <li class="${cls(0,c)}"><span class="dot">1</span><div><h3>${dev?'Approve on your verified phone':'Use your passkey'}</h3>
+      <p>${dev?'We sent an approval request to Dana’s iPhone, the device on file. Approve it there to continue.':'Confirm with Face ID, Touch ID, or your device PIN.'}</p>
+      ${cur===0?`<div class="row"><span class="demo">Demo</span><button class="btn" data-act="pk-ok">${dev?'Approve on iPhone':'Use passkey'}</button><button class="link" data-act="pk-fail">${dev?'Deny on iPhone':'Passkey fails'}</button></div>`:''}</div></li>
+    <li class="${cls(1,c)}"><span class="dot">2</span><div><h3>${voice?'Confirm who you’re paying in the app':'Say who you’re paying'}</h3>
+      <p>${voice?'On your verified iPhone, type the name of the person or business receiving this wire.':'Say or type the name of the person or business receiving this wire. We’ll check it against their bank account.'}</p>
+      ${cur===1?`<div class="inline-input"><input id="nm" aria-label="Payee name" placeholder="Payee name"><button class="btn sec" data-act="speak">${voice?'Fill in':'Speak'}</button><button class="btn" data-act="name">Confirm</button></div>${c.nameErr?`<p class="err">${c.nameErr}</p>`:''}`:''}</div></li>
+  </ol>${cur<2?`<div class="actions"><button class="link" data-act="cancel">Cancel this wire</button></div>`:''}</div>`;}
+function holdView(c){const cur=c.res.length;
+  const waitLine=t=>`<p class="waiting"><span class="spin sm" aria-hidden="true"></span>${t}</p>`;
+  return `<div class="notice bad">${ICON.lock}<div><h2>We’ve paused this wire</h2><p>Your ${usd(c.w.amount)} wire to ${esc(c.w.payee)} needs extra verification. No money has left your account.</p></div></div>
+  <div class="card"><ol class="stepper">
+    <li class="${cls(0,c)}"><span class="dot">1</span><div><h3>Verify your identity with Okta</h3><p>Open Okta Verify on your registered device and complete the check.</p>
+      ${cur===0?`<div class="row"><span class="demo">Demo</span><button class="btn" data-act="okta-ok">Complete verification</button><button class="link" data-act="okta-fail">Can’t verify</button></div>`:''}</div></li>
+    <li class="${cls(1,c)}"><span class="dot">2</span><div><h3>We call your trusted contact</h3><p>Meridian will call the trusted contact on your account to confirm this request.</p>
+      ${cur===1?waitLine('Our team is calling now. You don’t need to do anything.'):''}</div></li>
+    <li class="${cls(2,c)}"><span class="dot">3</span><div><h3>A fraud specialist reviews the wire</h3><p>Usually within 30 minutes during business hours. We’ll email you the outcome.</p>
+      ${cur===2?waitLine('A specialist is reviewing your wire now.'):''}</div></li>
+  </ol></div>`;}
+function norm(s){return String(s).toLowerCase().replace(/&/g,'and').replace(/\b(llc|inc|co|corp|ltd)\b/g,'').replace(/[^a-z0-9]/g,'');}
+
+$('app').addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act, c=S.cur;
+  switch(a){
+    case 'edit': S.step='form'; break;
+    case 'send': { const nc=newCase(); S.step='screening'; renderAll(); const t0=Date.now();
+      scoreWire(nc).then(r=>setTimeout(()=>{nc.result=r; nc.lane=r.lane; nc.record.result=r; scoreCase(nc); S.step='outcome'; renderAll();},Math.max(0,1200-(Date.now()-t0))))
+        .catch(err=>{nc.status='error'; ev(nc,`Scoring service unavailable (${err.message}). Wire not sent`,'k-bad'); S.step='outcome'; renderAll();});
+      return; }
+    case 'new': S.step='form'; S.cur=null; break;
+    case 'cancel': c.status='cancelled'; ev(c,'Customer cancelled the wire','k-warn'); break;
+    case 'pk-ok': c.res.push('ok'); ev(c,c.w.newDevice||c.result.policy?'Passkey approved on verified iPhone':'Passkey approved on current device','k-ok'); break;
+    case 'pk-fail': ev(c,'Passkey check failed','k-bad'); toHold(c,'Passkey failed'); break;
+    case 'speak': $('nm').value=c.w.payee; return;
+    case 'name': { const v=$('nm').value; if(!v.trim()){c.nameErr='Enter the payee’s name to continue.'; break;}
+      if(norm(v)===norm(c.w.payee)){c.res.push('ok'); c.nameErr=''; ev(c,`Payee name matched${c.result.policy?' (entered in app)':''}`,'k-ok'); ev(c,'Confirmation complete. Released','k-ok'); sendFed(c);}
+      else {c.attempts++; ev(c,`Payee name mismatch: customer entered “${v.slice(0,40)}”`,'k-bad');
+        if(c.attempts>=2){c.nameErr=''; toHold(c,'Second payee-name mismatch');} else c.nameErr='That doesn’t match the name on the receiving account. Check with the payee and try once more.';}
+      break; }
+    case 'okta-ok': c.res.push('ok'); ev(c,'Okta identity verification passed','k-ok');
+      if(c.w.contactChanged){c.res.push('fail'); block(c,'Trusted contact changed in the last 2 weeks, so it can’t be used');}
+      else {c.status='staff'; ev(c,'Waiting for staff to call the trusted contact','k-warn');} break;
+    case 'okta-fail': c.res.push('fail'); ev(c,'Okta identity verification failed','k-bad'); block(c,'Identity not confirmed'); break;
+  }
+  renderAll();});
+$('app').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='nm'){e.preventDefault(); document.querySelector('[data-act="name"]').click();}});
+
+// ----- employee view -----
+const EMP={'MCB-2041':{pw:'meridian-demo',role:'Fraud Analyst'}};
+let idle=null, gateErr='';
+function needsStaff(c){return c&&c.status==='staff';}
+function statusPill(c){
+  if(c.status==='sent') return '<span class="pill st-sent">Sent</span>';
+  if(c.status==='blocked') return '<span class="pill st-blocked">Blocked</span>';
+  if(c.status==='error') return `<div class="notice warn">${ICON.warn}<div><h2>We couldn’t finish your wire</h2><p>Our security check is unavailable right now, so nothing was sent. Please try again in a few minutes.</p></div></div><div class="actions"><button class="btn sec" data-act="new">Back to wires</button></div>`;
+  if(c.status==='cancelled') return '<span class="pill st-cancel">Cancelled</span>';
+  if(c.status==='scoring') return '<span class="pill st-scoring">Scoring…</span>';
+  if(c.status==='error') return '<span class="pill st-blocked">Not scored</span>';
+  if(c.status==='staff') return '<span class="pill st-act">Action needed</span>';
+  return '<span class="pill st-wait">Waiting on customer</span>';}
+function renderEmp(){
+  const box=$('emp'); const pending=S.cases.filter(needsStaff).length;
+  $('badge').hidden=!pending;
+  if(!S.emp){ box.innerHTML=`<div class="emain"><div class="gate">
+      <h2 style="margin:0 0 4px;font-size:18px">Employee sign-in</h2>
+      <p class="esmall" style="margin:0 0 6px">Risk scores and customer data are restricted to authorized Meridian staff.</p>
+      ${pending?`<p style="color:var(--a);font-size:13.5px;margin:6px 0">${pending} wire${pending>1?'s are':' is'} waiting for staff action.</p>`:''}
+      <form id="login" autocomplete="off" novalidate>
+        <label for="emp-id">Employee ID</label><input id="emp-id" autocomplete="off" spellcheck="false">
+        <label for="emp-pw">Password</label><input id="emp-pw" type="password" autocomplete="off">
+        ${gateErr?`<p class="gerr">${esc(gateErr)}</p>`:''}
+        <button class="ebtn pri" type="submit">Sign in</button>
+        <p class="esmall" style="margin:12px 0 0">Demo access: <b>MCB-2041</b> / <b>meridian-demo</b>. Simulated in the browser; not real security. No data export: this console can’t download, copy, or print customer data.</p>
+      </form></div></div>`;
+    $('login').addEventListener('submit',e=>{e.preventDefault(); const id=$('emp-id').value.trim().toUpperCase();
+      if(EMP[id]&&EMP[id].pw===$('emp-pw').value){S.emp=Object.assign({id},EMP[id]); gateErr=''; resetIdle(); renderEmp();}
+      else {gateErr='Employee ID or password is incorrect.'; renderEmp(); $('emp-id').value=id;}});
+    return; }
+  const c=S.cases.find(x=>x.id===S.sel)||S.cases[0];
+  box.innerHTML=`<div class="emain">
+    <div class="ehead"><h2>Wire monitoring</h2><div class="ewho"><span>${esc(S.emp.role)} (${S.emp.id})</span><button class="ebtn sm" data-e="signout">Sign out</button></div></div>
+    ${c?caseView(c):`<div class="empty">No wires yet today.<br>When the customer presses Send, the wire appears here with its score.</div>`}
+    ${S.cases.length>1?`<div class="ebox"><h3>Today’s wires</h3><table class="hist"><tbody>${S.cases.map(x=>`<tr data-sel="${x.id}" aria-current="${c&&x.id===c.id}"><td><b>${x.id}</b><div class="esmall">${x.at}</div></td><td>${esc(x.w.payee)}<div class="esmall">${usd0(x.w.amount)}${x.w.channel==='voice'?', phone':''}</div></td><td class="r"><span class="lane ${x.lane}" style="font-size:13.5px">${!x.result?'':x.result.score.toFixed(2)+' '+LN[x.lane]}</span><div>${statusPill(x)}</div></td></tr>`).join('')}</tbody></table></div>`:''}
+    <div class="ebox"><h3>Model</h3><p class="esmall" style="margin:0 0 8px">Version <b>${esc(MODEL.version)}</b>${MODEL.auc?`, held-out AUC ${(+MODEL.auc).toFixed(3)}`:''}. ${API?`Scoring via API at ${esc(API)}. Analyst decisions are saved as labels${MODEL.labels?` (${MODEL.labels} so far)`:''}.`:'Scoring in this browser with the trained weights. Run the API (see README) to save analyst labels and retrain.'}</p>
+      ${API?`<button class="ebtn sm" data-e="retrain" ${MODEL.busy?'disabled':''}>${MODEL.busy?'Retraining…':'Retrain with analyst labels'}</button>`:''}</div>
+    <p class="esmall">View only. Customer data can’t be exported, copied, or printed. Signs out after 10 minutes idle.</p>
+  </div>`;
+}
+function caseView(c){
+  const r=c.result, scoring=c.status==='scoring'||!r;
+  const th=Object.assign({},WireRisk.DEFAULT_THRESHOLDS,c.record.options.thresholds);
+  const a=Math.min(th.release,th.hold)*100,b=Math.max(th.release,th.hold)*100;
+  const t=c.input, yes=v=>v?'Yes':'No';
+  const sig=[['Amount vs. usual',`${(t.amount/t.usualAmount).toFixed(1)}×`,t.amount/t.usualAmount>2.5],['Outside usual hours',yes(t.outsideHours),t.outsideHours],['New device or IP',yes(t.newDevice),t.newDevice],
+    ['Typing mismatch',(+t.typingMismatch).toFixed(2),t.typingMismatch>.3],['Remote-access tool',yes(t.remoteAccess),t.remoteAccess],['SIM swap, 7 days',yes(t.simSwap7d),t.simSwap7d],
+    ['Payee on mule list',yes(t.muleListHit),t.muleListHit],['Beneficiary age',`${t.beneficiaryAgeDays} days`,t.beneficiaryAgeDays<90],['Bank details changed',yes(t.bankDetailsChanged30d),t.bankDetailsChanged30d],
+    ['High-risk destination',yes(t.highRiskDestination),t.highRiskDestination],['First wire to payee',yes(t.firstTimePayee),t.firstTimePayee],['Senders into payee, 30 days',t.beneficiarySenders30d,t.beneficiarySenders30d>5],
+    ['Debt-to-income',Math.round(t.debtToIncome*100)+'%',t.debtToIncome>.5]];
+  let action='';
+  if(c.status==='staff' && c.res.length===1) action=`<div class="ebox action"><h3>Your action: call the trusted contact</h3><p>Call Jordan Whitfield at (317) 555-0187, the trusted contact on file (unchanged for 14+ months). Ask them to confirm the customer is sending ${usd0(c.w.amount)} to ${esc(c.w.payee)}.</p>
+    <div class="row"><button class="ebtn pri" data-e="tc-ok">Contact confirms</button><button class="ebtn bad" data-e="tc-fail">Contact doesn’t confirm</button></div></div>`;
+  if(c.status==='staff' && c.res.length===2) action=`<div class="ebox action"><h3>Your action: release or block</h3><p>Okta and the trusted contact both passed. Review the reasons and signals, then decide. The customer is waiting.</p>
+    <div class="row"><button class="ebtn pri" data-e="an-ok">Release wire</button><button class="ebtn bad" data-e="an-fail">Block wire</button></div></div>`;
+  return `<div class="ebox"><div class="casehead"><div><div class="caseid">${c.id}</div><div class="esmall">Received ${c.at}${c.w.channel==='voice'?', by phone':', online banking'}</div></div>${statusPill(c)}</div>
+      <dl class="kv"><dt>Customer</dt><dd>${esc(c.w.customer)}</dd><dt>From</dt><dd>${esc(c.w.from)}</dd><dt>To</dt><dd>${esc(c.w.payee)}<div class="esmall">${esc(c.w.bank)} ••${esc(c.w.mask||'----')}, ${esc(c.w.country)}</div></dd><dt>Amount</dt><dd class="amt">${usd(c.w.amount)}</dd></dl></div>
+    ${action}
+    <div class="ebox"><h3>Risk score</h3>
+      ${scoring?`<p class="esmall"><span class="spin sm" aria-hidden="true"></span>Scoring…</p>`:`
+      <div class="scorewrap"><b>${r.score<.01?r.score.toFixed(3):r.score.toFixed(2)}</b><span class="lane ${c.result.lane}">${LN[c.result.lane]}</span></div>
+      <div class="rail" aria-hidden="true"><div class="bands"><i style="width:${a}%;background:var(--g)"></i><i style="width:${b-a}%;background:var(--a)"></i><i style="width:${100-b}%;background:var(--r)"></i></div><div class="mk" style="left:${r.score*100}%"></div></div>
+      ${r.policy?`<p class="policy">Voice policy applied. The score alone would have sent this to ${LN[r.scoreLane]}.</p>`:''}
+      ${c.lane!==c.result.lane?`<p class="policy">Moved to Hold after a failed confirmation step.</p>`:''}
+      <ul class="reasons">${r.reasons.length?r.reasons.map((x,i)=>`<li><span>${i+1}</span><span>${esc(x.text)}</span></li>`).join(''):'<li class="esmall">No signal is riskier than this customer’s normal pattern.</li>'}</ul>`}
+    </div>
+    <div class="ebox"><h3>Activity</h3><ol class="tl">${c.events.map(e=>`<li><time>${e.t}</time><span class="${e.kind}">${esc(e.msg)}</span></li>`).join('')}</ol></div>
+    <div class="ebox"><details><summary>Signals at time of scoring</summary><div class="sigs">${sig.map(([k,v,h])=>`<span>${k}</span><span class="${h?'hot':''}">${v}</span>`).join('')}</div></details></div>
+    <div class="ebox"><details><summary>Decision record (view only)</summary><pre class="json">${esc(JSON.stringify(c.record,null,2))}</pre></details></div>`;
+}
+$('emp').addEventListener('click',e=>{
+  const s=e.target.closest('[data-sel]'); if(s){S.sel=s.dataset.sel; renderEmp(); return;}
+  const b=e.target.closest('[data-e]'); if(!b) return; const a=b.dataset.e; const c=S.cases.find(x=>x.id===S.sel)||S.cases[0];
+  const who=`${S.emp.role} ${S.emp.id}`;
+  switch(a){
+    case 'signout': signOut(''); return;
+    case 'tc-ok': c.res.push('ok'); ev(c,`${who} called trusted contact: confirmed`,'k-ok'); ev(c,'Waiting for analyst decision','k-warn'); break;
+    case 'tc-fail': c.res.push('fail'); ev(c,`${who} called trusted contact: not confirmed`,'k-bad'); block(c,'Trusted contact did not confirm'); break;
+    case 'an-ok': c.res.push('ok'); ev(c,`${who} released the wire`,'k-ok'); sendFed(c); saveLabel(c,'legitimate'); break;
+    case 'an-fail': c.res.push('fail'); ev(c,`${who} blocked the wire`,'k-bad'); block(c,'Analyst decision'); saveLabel(c,'fraud'); break;
+    case 'retrain': MODEL.busy=true; renderEmp();
+      apiPost('/retrain').then(j=>{MODEL.version=j.modelVersion; MODEL.auc=j.auc; MODEL.labels=j.analystLabels;})
+        .catch(e=>alert('Retrain failed: '+e.message)).finally(()=>{MODEL.busy=false; renderAll();}); return;
+  }
+  renderAll();});
+function saveLabel(c,label){
+  if(!API) return;
+  apiPost('/feedback',{caseId:c.id,wire:c.input,label,employeeId:S.emp.id})
+    .then(j=>{MODEL.labels=j.analystLabels; ev(c,`Saved as a “${label}” label for the next retrain`,'k-ok');})
+    .catch(e=>ev(c,`Could not save label (${e.message})`,'k-bad')).finally(renderEmp);}
+function signOut(why){S.emp=null; gateErr=why; clearTimeout(idle); renderEmp();}
+function resetIdle(){clearTimeout(idle); if(S.emp) idle=setTimeout(()=>signOut('Signed out after 10 minutes of inactivity.'),10*60*1000);}
+['click','keydown','input'].forEach(evn=>document.addEventListener(evn,resetIdle,true));
+['copy','cut','contextmenu','dragstart'].forEach(evn=>$('pane-e').addEventListener(evn,e=>{if(!e.target.closest('input'))e.preventDefault();}));
+window.addEventListener('beforeprint',()=>{if(S.emp) signOut('Signed out: printing risk data isn’t allowed.');});
+
+// ----- mobile tabs -----
+function showPane(w){$('tab-c').setAttribute('aria-selected',w==='c'); $('tab-e').setAttribute('aria-selected',w==='e');
+  if(w==='c'){$('pane-c').removeAttribute('data-hide-mobile'); $('pane-e').setAttribute('data-hide-mobile','');}
+  else {$('pane-e').removeAttribute('data-hide-mobile'); $('pane-c').setAttribute('data-hide-mobile','');}}
+$('tab-c').onclick=()=>showPane('c'); $('tab-e').onclick=()=>showPane('e');
+
+function renderAll(){renderCust(); renderEmp(); renderPreview();}
+bindControls(); syncBen(); fillSignals(); renderAll();
+if(API) fetch(API+'/model').then(r=>r.json()).then(j=>{MODEL.version=j.version; MODEL.auc=j.testMetrics&&j.testMetrics.auc; renderAll();})
+  .catch(()=>{$('preview').innerHTML+=' <b style="color:var(--r)">API not reachable</b>';});
+})();
+</script>
+</body>
+</html>
