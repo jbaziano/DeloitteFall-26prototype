@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meridian fraud model: data and training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F4F7; --surface:#FFFFFF; --ink:#16212B; --muted:#5D6B78; --line:#DCE2E8; --soft:#F6F8FA;
+  --navy:#1B2453; --blue:#0B5FCF; --blue2:#8DB3EA; --grey:#A3ADB7; --fraud:#D4402B; --legit:#2F6FD0;
+  --g:#5E9E10; --gf:#86BC25; --a:#B98500; --af:#F2B620; --r:#C23A26; --rf:#E0533D; --focus:#2F6FDB;
+  color-scheme:light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E1419; --surface:#161F27; --ink:#E4EAF0; --muted:#97A6B3; --line:#2A3743; --soft:#1B2630;
+  --navy:#121936; --blue:#5B9BF2; --blue2:#3B5F93; --grey:#5F6B76; --fraud:#FF7A63; --legit:#6FA3F2;
+  --g:#9BD53C; --a:#F2C14E; --r:#FF7A63; --focus:#7FA8FF; color-scheme:dark;}}
+:root[data-theme="dark"]{--paper:#0E1419; --surface:#161F27; --ink:#E4EAF0; --muted:#97A6B3; --line:#2A3743; --soft:#1B2630;
+  --navy:#121936; --blue:#5B9BF2; --blue2:#3B5F93; --grey:#5F6B76; --fraud:#FF7A63; --legit:#6FA3F2; --g:#9BD53C; --a:#F2C14E; --r:#FF7A63; color-scheme:dark;}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Open Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.55;font-variant-numeric:tabular-nums}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+a{color:var(--blue)}
+/* header */
+.top{background:var(--navy);color:#fff;position:sticky;top:0;z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--navy);z-index:10}
+.top .in{max-width:1180px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:10px 24px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:.08em}
+.logo small{display:block;font-size:9px;letter-spacing:.22em;opacity:.75;font-weight:700}
+.tnav{display:flex;gap:4px;flex-wrap:wrap}
+.tnav a{color:#fff;text-decoration:none;padding:6px 10px;border-radius:6px;font-size:14px;opacity:.8}
+.tnav a[aria-current="page"]{opacity:1;font-weight:700;background:rgba(255,255,255,.14)}
+.who{margin-left:auto;font-size:13px;display:flex;gap:10px;align-items:center;opacity:.9}
+.who button{background:none;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:5px;padding:3px 10px;cursor:pointer;font-size:12.5px}
+/* layout */
+main{max-width:1180px;margin:0 auto;padding:30px 24px 70px}
+.hero h1{font-size:clamp(28px,4vw,38px);font-weight:700;margin:0 0 6px;letter-spacing:-.01em;line-height:1.15}
+.hero p{color:var(--muted);margin:0;max-width:72ch;font-size:16px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.toc a{font-size:13.5px;text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:999px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:26px 0 8px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.kpi b{display:block;font-size:32px;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.kpi span{display:block;font-size:13.5px;color:var(--muted);margin-top:4px}
+.kpi em{font-style:normal;font-size:12.5px;color:var(--muted)}
+section{margin-top:44px}
+.sh{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.sh .n{font-weight:800;color:var(--blue);font-size:14px}
+.sh h2{margin:0;font-size:23px;font-weight:700}
+.lede{color:var(--muted);margin:0 0 18px;max-width:78ch}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;min-width:0}
+.card h3{margin:0 0 4px;font-size:15.5px;font-weight:700}
+.card .cap{font-size:13.5px;color:var(--muted);margin:0 0 14px}
+.note{font-size:13px;color:var(--muted);margin:12px 0 0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden;margin-bottom:18px}
+.stats div{padding:14px 18px;border-left:1px solid var(--line)}
+.stats div:first-child{border-left:0}
+.stats b{display:block;font-size:22px;font-weight:800}
+.stats span{font-size:13px;color:var(--muted)}
+@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}.stats div:nth-child(3){border-left:0}.stats div:nth-child(n+3){border-top:1px solid var(--line)}}
+/* bars */
+.bars{display:grid;gap:9px}
+.bar{display:grid;grid-template-columns:minmax(120px,190px) 1fr 64px;gap:12px;align-items:center;font-size:14px}
+.bar .t{height:14px;background:var(--soft);border-radius:3px;overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:3px}
+.bar b{text-align:right;font-weight:700}
+.metric .bar{grid-template-columns:112px 1fr 46px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-bottom:12px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+/* split bar */
+.split{display:flex;height:46px;border-radius:8px;overflow:hidden;font-size:13px;font-weight:700;color:#fff}
+.split div{display:flex;align-items:center;justify-content:center;padding:0 8px;white-space:nowrap;overflow:hidden}
+.splitkey{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px;font-size:13.5px}
+.splitkey b{display:block;font-size:16px}
+.splitkey span{color:var(--muted)}
+@media (max-width:640px){.splitkey{grid-template-columns:1fr}}
+/* rounds */
+.rounds{display:grid;gap:7px}
+.rd{display:grid;grid-template-columns:70px 1fr 140px;gap:12px;align-items:center;font-size:13.5px}
+.rd .t{height:18px;background:var(--soft);border-radius:3px;overflow:hidden;display:flex}
+.rd .t i{display:block;height:100%}
+.rd b{text-align:right;font-weight:600}
+.audit{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.audit div{background:var(--soft);border-radius:10px;padding:12px 14px}
+.audit b{display:block;font-size:20px;font-weight:800}
+.audit span{font-size:13px;color:var(--muted)}
+@media (max-width:640px){.audit{grid-template-columns:1fr}}
+/* features */
+.feat{display:grid;grid-template-columns:minmax(150px,230px) 1fr minmax(150px,210px);gap:14px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.feat:first-of-type{border-top:0}
+.feat small{display:block;color:var(--muted);font-size:12px}
+.wbar{position:relative;height:16px}
+.wbar::before{content:"";position:absolute;left:30%;top:-4px;bottom:-4px;width:1px;background:var(--grey)}
+.wbar i{position:absolute;top:0;height:100%;border-radius:2px}
+.feat .cmp{font-size:13px;color:var(--muted);text-align:right}
+.feat .cmp b{color:var(--fraud);font-weight:700}
+@media (max-width:700px){.feat{grid-template-columns:1fr;gap:4px}.feat .cmp{text-align:left}}
+/* histogram */
+.hrow{display:grid;grid-template-columns:86px 10px 1fr 42px 1fr 30px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.hrow .lane{width:10px;height:100%;min-height:18px;border-radius:2px}
+.hrow .t{height:14px;background:var(--soft);border-radius:3px;overflow:hidden;position:relative}
+.hrow .t i{display:block;height:100%}
+.hrow .c{font-size:12px;color:var(--muted);text-align:right}
+.hhead{display:grid;grid-template-columns:86px 10px 1fr 42px 1fr 30px;gap:8px;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:4px}
+/* tables */
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12.5px;color:var(--muted);font-weight:700}
+th:first-child,td:first-child{text-align:left}
+tbody tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:1px 9px;border-radius:999px;border:1px solid currentColor}
+.l-release{color:var(--g)} .l-confirm{color:var(--a)} .l-hold{color:var(--r)}
+/* examples */
+.ex{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:980px){.ex{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.ex{grid-template-columns:1fr}}
+.exc{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:12px;padding:14px 16px}
+.exc.good{--c:var(--gf)} .exc.bad{--c:var(--rf)}
+.exc .v{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.exc h4{margin:2px 0 8px;font-size:16px}
+.exc .sc{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.exc .sc b{font-size:26px;font-weight:800}
+.exc dl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin:0 0 8px;font-size:13px}
+.exc dt{color:var(--muted)} .exc dd{margin:0;font-weight:600;text-align:right}
+.exc ul{margin:0;padding-left:18px;font-size:13px}
+.exc .none{font-size:13px;color:var(--muted)}
+/* roc */
+.roc svg{width:100%;height:auto;max-width:420px;display:block;margin:0 auto}
+.limits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px}
+@media (max-width:760px){.limits{grid-template-columns:1fr}}
+.limits p{margin:0;font-size:14.5px}
+.limits b{display:block}
+footer{font-size:13px;color:var(--muted);margin-top:44px;border-top:1px solid var(--line);padding-top:14px}
+/* gate */
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.gcard{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:26px}
+.gcard h1{font-size:20px;margin:0 0 4px}
+.gcard p{color:var(--muted);font-size:14px;margin:0 0 14px}
+.gcard label{display:block;font-size:13.5px;font-weight:600;margin:10px 0 4px}
+.gcard input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.gcard button{width:100%;margin-top:16px;padding:10px;border:0;border-radius:999px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer}
+.gerr{color:var(--r);font-size:13.5px;margin:8px 0 0}
+.gcard small{display:block;color:var(--muted);font-size:12.5px;margin-top:14px}
+.secure{-webkit-user-select:none;user-select:none}
+@media print{body{display:none!important}}
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <form class="gcard" id="login" autocomplete="off" novalidate>
+    <h1>Meridian employee sign-in</h1>
+    <p>Model and training data are restricted to authorized fraud and model-risk staff.</p>
+    <label for="emp-id">Employee ID</label><input id="emp-id" autocomplete="off" spellcheck="false">
+    <label for="emp-pw">Password</label><input id="emp-pw" type="password" autocomplete="off">
+    <p class="gerr" id="emp-err" hidden></p>
+    <button type="submit">Sign in</button>
+    <small>Demo access: <b>MCB-2041</b> / <b>meridian-demo</b>. Simulated in the browser; not real security. This page shows summaries only and can’t be copied, downloaded, or printed.</small>
+  </form>
+</div>
+
+<div id="app" class="secure" hidden>
+  <header class="top"><div class="in">
+    <div class="logo"><svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M7 19 L11 9 L14 16 L17 9 L21 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg><span>MERIDIAN<small>FRAUD OPERATIONS</small></span></div>
+    <nav class="tnav" aria-label="Views"><a href="index.html">Wire demo</a><a href="model.html" aria-current="page">Model &amp; data</a></nav>
+    <div class="who"><span id="emp-who"></span><button type="button" id="signout">Sign out</button></div>
+  </div></header>
+
+  <main id="main"></main>
+</div>
+
+<script src="model_report.js"></script>
+<script>
+(function(){
+const R = window.MODEL_REPORT;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pct = (x, d=0) => (x*100).toFixed(d) + '%';
+const n = x => Math.round(x).toLocaleString('en-US');
+const usd = x => '$' + Math.round(x).toLocaleString('en-US');
+const day = s => new Date(s + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+const LANE = {release:'Release', confirm:'Confirm', hold:'Hold'};
+
+function bars(rows, max, color, fmt){
+  return `<div class="bars">${rows.map(r=>`<div class="bar"><span>${esc(r.label)}</span><div class="t"><i style="width:${Math.max(0.5, r.value/max*100)}%;background:${r.color||color}"></i></div><b>${fmt(r.value)}</b></div>`).join('')}</div>`;
+}
+
+function render(){
+  if(!R){ $('main').innerHTML = '<p>Model report not found. Run <code>python -m ml.train</code> then <code>python -m ml.report</code>.</p>'; return; }
+  const D=R.data, T=R.test, ST=R.selfTraining, semi=T.semi_supervised, sup=T.supervised_only, rules=T.static_rules;
+  const plAcc = 1 - ST.pseudo_label_errors / ST.pseudo_labeled;
+
+  // ---- 1. data ----
+  const fmax = Math.max(...D.fraudTypes.map(f=>f.count));
+  const s1 = `<section id="data"><div class="sh"><span class="n">01</span><h2>The data it learned from</h2></div>
+    <p class="lede">Every wire is synthetic, but built the way Meridian’s real data would be. Each wire is compared with that customer’s own history (usual amounts, devices, payees, hours) and with the payment network (who else pays the receiving account).</p>
+    <div class="stats"><div><b>${n(D.customers)}</b><span>customers (${n(D.segments.small_business||0)} business, ${n(D.segments.retail||0)} retail)</span></div>
+      <div><b>${n(D.wires)}</b><span>wires, ${day(D.firstDay)} to ${day(D.lastDay)}</span></div>
+      <div><b>${n(D.fraud)}</b><span>fraudulent wires (${pct(D.fraudRate,1)})</span></div>
+      <div><b>13</b><span>signals per wire, in 5 groups</span></div></div>
+    <div class="grid2">
+      <div class="card"><h3>Fraud patterns in the data</h3><p class="cap">Four ways fraud reaches a wire at a community bank.</p>
+        ${bars(D.fraudTypes.map(f=>({label:f.name,value:f.count})), fmax, 'var(--fraud)', n)}</div>
+      <div class="card"><h3>Where the 13 signals come from</h3><p class="cap">The same groups as the flow chart.</p>
+        <div class="tbl"><table><tbody>
+          <tr><td><b>Customer history</b></td><td style="white-space:normal;text-align:left">Amount vs. usual, time of day, debt-to-income</td></tr>
+          <tr><td><b>Device and behavior</b></td><td style="white-space:normal;text-align:left">New device or IP, typing rhythm, remote-access tools</td></tr>
+          <tr><td><b>External signals</b></td><td style="white-space:normal;text-align:left">SIM swaps, consortium mule list</td></tr>
+          <tr><td><b>Beneficiary</b></td><td style="white-space:normal;text-align:left">Account age, changed bank details, destination</td></tr>
+          <tr><td><b>Payment network</b></td><td style="white-space:normal;text-align:left">First wire to payee, senders into the account</td></tr>
+        </tbody></table></div></div>
+    </div></section>`;
+
+  // ---- 2. training ----
+  const sp=R.split, tot=sp.labeled+sp.unlabeled+sp.test;
+  const rmax=Math.max(...ST.rounds.map(r=>r.added));
+  const s2 = `<section id="training"><div class="sh"><span class="n">02</span><h2>How it learned: semi-supervised self-training</h2></div>
+    <p class="lede">Confirmed fraud labels are rare and slow to get, so the model starts with a small labeled set, then teaches itself from unlabeled wires, but only from the ones it is at least 95% sure about.</p>
+    <div class="card"><h3>How the wires were used</h3><p class="cap">The test wires are the most recent ones, so the model is judged on the “future,” like it would be in production.</p>
+      <div class="split" role="img" aria-label="${n(sp.labeled)} labeled, ${n(sp.unlabeled)} unlabeled, ${n(sp.test)} test wires">
+        <div style="flex:${sp.labeled};background:var(--fraud)">${n(sp.labeled)}</div>
+        <div style="flex:${sp.unlabeled};background:var(--blue)">${n(sp.unlabeled)} unlabeled</div>
+        <div style="flex:${sp.test};background:var(--grey)">${n(sp.test)} test</div></div>
+      <div class="splitkey"><div><b>${n(sp.labeled)} labeled</b><span>700 normal, 300 fraud. The model sees the answers.</span></div>
+        <div><b>${n(sp.unlabeled)} unlabeled</b><span>About 3% fraud, like real life. No answers given.</span></div>
+        <div><b>${n(sp.test)} held out</b><span>${n(sp.test_fraud)} fraud. Never used for training, only for grading.</span></div></div></div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card"><h3>Pseudo-labels added in each round</h3><p class="cap">Each round, the model labels the wires it’s now confident about and retrains. It stops when nothing new reaches 95%.</p>
+        <div class="legend"><span><i style="background:var(--blue)"></i>Labeled normal</span><span><i style="background:var(--fraud)"></i>Labeled fraud</span></div>
+        <div class="rounds">${ST.rounds.map(r=>`<div class="rd"><span>Round ${r.round}</span><div class="t"><i style="width:${(r.added-r.fraud)/rmax*100}%;background:var(--blue)"></i><i style="width:${Math.max(r.fraud?0.6:0,r.fraud/rmax*100)}%;background:var(--fraud)"></i></div><b>${n(r.added)}${r.fraud?` (${r.fraud} fraud)`:''}</b></div>`).join('')}</div></div>
+      <div class="card"><h3>Checking the model’s own labels</h3><p class="cap">Possible here because the data is synthetic and the true answers are known. In production, analyst decisions take this role.</p>
+        <div class="audit"><div><b>${n(ST.pseudo_labeled)}</b><span>wires pseudo-labeled, ${n(ST.pseudo_labeled_fraud)} as fraud</span></div>
+          <div><b>${pct(plAcc,1)}</b><span>correct (${n(ST.pseudo_label_errors)} wrong)</span></div>
+          <div><b>${n(ST.never_confident)}</b><span>never reached 95%, so left out</span></div></div>
+        <p class="note">After training, scores are adjusted from the training mix (${pct(ST.training_fraud_share,1)} fraud) to a realistic 3% fraud rate, so a score reads as a real-world probability.</p></div>
+    </div></section>`;
+
+  // ---- 3. features ----
+  const F=[...R.features].sort((a,b)=>Math.abs(b.weight)-Math.abs(a.weight));
+  const wmax=Math.max(...F.map(f=>Math.abs(f.weight)));
+  const cmp=f=>{
+    if(f.kind==='rate') return `<b>${pct(f.fraud)}</b> of fraud vs ${pct(f.legit)} of legit`;
+    const u = f.label.includes('age') ? ' days' : f.label.includes('Amount') ? '×' : f.label.includes('Debt') ? '' : '';
+    const v = x => f.label.includes('Debt') ? pct(x) : f.label.includes('Typing') ? x.toFixed(2) : (f.label.includes('Amount') ? x.toFixed(1) : n(x)) + u;
+    return `median <b>${v(f.fraud)}</b> fraud vs ${v(f.legit)} legit`;
+  };
+  const s3 = `<section id="signals"><div class="sh"><span class="n">03</span><h2>What it pays attention to</h2></div>
+    <p class="lede">The model is a logistic regression, so each signal has one weight. Bars to the right raise risk; bars to the left lower it. These weights are also how every score gets its top three reasons.</p>
+    <div class="card"><div class="legend"><span><i style="background:var(--fraud)"></i>Raises risk</span><span><i style="background:var(--legit)"></i>Lowers risk</span><span>Right column: how fraud and legitimate wires differ in the data</span></div>
+      ${F.map(f=>{const w=Math.abs(f.weight)/wmax*70; return `<div class="feat"><span>${esc(f.label)}<small>${esc(f.group)}</small></span>
+        <div class="wbar" title="Weight ${f.weight}"><i style="${f.weight>=0?`left:30%;width:${w}%;background:var(--fraud)`:`left:${30-Math.min(30,w)}%;width:${Math.min(30,w)}%;background:var(--legit)`}"></i></div>
+        <span class="cmp">${cmp(f)}</span></div>`;}).join('')}
+      <p class="note">Why does “Senders into beneficiary” lower risk? In this data, popular payees like title companies and payroll processors receive money from many customers, while mule accounts are used briefly and replaced. With real data this could flip, which is one reason the model must be retrained and reviewed on Meridian’s own history.</p></div></section>`;
+
+  // ---- 4. results ----
+  const metric=(title,key,good,note)=>`<div class="card metric"><h3>${title}</h3><p class="cap">${note}</p>
+    ${bars([{label:'ML model',value:semi[key],color:'var(--blue)'},{label:'Supervised only',value:sup[key],color:'var(--blue2)'},{label:'Rules today',value:rules[key],color:'var(--grey)'}],1,'',x=>pct(x))}
+    <p class="note">${good}</p></div>`;
+  const legitTot=R.histogram.reduce((a,h)=>a+h.legit,0), fraudTot=R.histogram.reduce((a,h)=>a+h.fraud,0);
+  const hmax=Math.max(...R.histogram.map(h=>Math.max(h.legit/legitTot,h.fraud/fraudTot)));
+  const laneOf=h=>h.hi<=R.thresholds.release?'var(--gf)':h.hi<=R.thresholds.hold?'var(--af)':'var(--rf)';
+  const L=R.lanes;
+  const s4 = `<section id="results"><div class="sh"><span class="n">04</span><h2>How well it works on wires it never saw</h2></div>
+    <p class="lede">Graded on the ${n(R.split.test)} most recent wires. “Challenged” means the wire went to Confirm or Hold instead of being released automatically.</p>
+    <div class="grid3">
+      ${metric('Fraud stopped or challenged','fraud_caught','Higher is better.','Share of fraudulent wires sent to Confirm or Hold.')}
+      ${metric('Legitimate customers challenged','legit_challenged','Lower is better: fewer good customers interrupted.','Share of good wires that got a passkey step or a hold.')}
+      ${metric('Flags that turned out legitimate','flags_that_were_legit','Lower is better. Meridian’s current wire rate is 88%.','Same definition as Meridian’s false-positive rate.')}
+    </div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card"><h3>Where scores land, fraud vs. legitimate</h3><p class="cap">Share of each group in each score range. A good model pushes the two groups apart.</p>
+        <div class="legend"><span><i style="background:var(--legit)"></i>Legitimate (${n(legitTot)})</span><span><i style="background:var(--fraud)"></i>Fraud (${n(fraudTot)})</span><span><i style="background:var(--gf)"></i><i style="background:var(--af)"></i><i style="background:var(--rf)"></i>Lane</span></div>
+        <div class="hhead"><span>Score</span><span></span><span>Legitimate</span><span></span><span>Fraud</span><span></span></div>
+        ${R.histogram.map(h=>`<div class="hrow"><span>${h.lo.toFixed(2)}–${h.hi.toFixed(2)}</span><span class="lane" style="background:${laneOf(h)}"></span>
+          <div class="t"><i style="width:${h.legit/legitTot/hmax*100}%;background:var(--legit)"></i></div><span class="c">${h.legit?n(h.legit):''}</span>
+          <div class="t"><i style="width:${h.fraud/fraudTot/hmax*100}%;background:var(--fraud)"></i></div><span class="c">${h.fraud?n(h.fraud):''}</span></div>`).join('')}</div>
+      <div class="card roc"><h3>Catching fraud vs. bothering customers</h3><p class="cap">ROC curve: each point is a possible threshold. Up and to the left is better. The model’s AUC is ${semi.auc.toFixed(3)} (1.0 is perfect, 0.5 is guessing). The supervised-only curve sits almost on top of it; self-training’s gain shows up at the 0.05 and 0.40 thresholds the bank actually uses.</p>
+        ${roc()}
+        <div class="legend" style="justify-content:center;margin-top:8px"><span><i style="background:var(--blue)"></i>ML model</span><span><i style="background:var(--blue2)"></i>Supervised only</span><span><i style="background:var(--grey);border-radius:50%"></i>Static rules</span></div></div>
+    </div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card"><h3>Lane outcomes</h3><p class="cap">Where the ${n(R.split.test)} test wires were routed.</p>
+        <div class="tbl"><table><thead><tr><th>Lane</th><th>Legitimate</th><th>Fraud</th></tr></thead><tbody>
+          ${['release','confirm','hold'].map(k=>`<tr><td><span class="pill l-${k}">${LANE[k]}</span></td><td>${n(L[k].legit)}</td><td>${n(L[k].fraud)}</td></tr>`).join('')}
+        </tbody></table></div>
+        <p class="note">${pct(semi.fraud_held)} of fraud went straight to Hold, where an analyst decides.</p></div>
+      <div class="card"><h3>Catch rate by fraud pattern</h3><p class="cap">Where the model adds the most over static rules.</p>
+        <div class="tbl"><table><thead><tr><th>Pattern</th><th>Test wires</th><th>ML model</th><th>Rules</th></tr></thead><tbody>
+          ${R.byType.map(t=>`<tr><td>${esc(t.name)}</td><td>${t.n}</td><td><b>${pct(t.model)}</b></td><td>${pct(t.rules)}</td></tr>`).join('')}
+        </tbody></table></div>
+        <p class="note">Business email compromise is the hardest for rules: the customer, device, and payee name all look normal. The model catches it from changed bank details and young accounts.</p></div>
+    </div></section>`;
+
+  // ---- 5. examples ----
+  const s5 = `<section id="examples"><div class="sh"><span class="n">05</span><h2>Where it gets it right, and wrong</h2></div>
+    <p class="lede">Six real test wires from the synthetic data, including its worst false alarm and its worst miss.</p>
+    <div class="ex">${R.examples.map(e=>{const good=/Caught|Correctly/.test(e.verdict); return `<div class="exc ${good?'good':'bad'}">
+      <div class="v">${esc(e.verdict)}</div><h4>${esc(e.truth)}</h4>
+      <div class="sc"><b>${e.score<.01?e.score.toFixed(3):e.score.toFixed(2)}</b><span class="pill l-${e.lane}">${LANE[e.lane]}</span></div>
+      <dl><dt>Customer</dt><dd>${esc(e.segment)}</dd><dt>Amount</dt><dd>${usd(e.amount)} (${e.amountVsUsual}× usual)</dd>
+        <dt>Beneficiary age</dt><dd>${n(e.beneficiaryAgeDays)} days</dd><dt>First wire to payee</dt><dd>${e.firstTimePayee?'Yes':'No'}</dd><dt>New device</dt><dd>${e.newDevice?'Yes':'No'}</dd></dl>
+      ${e.reasons.length?`<ul>${e.reasons.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:`<p class="none">Nothing stood out, so it was released automatically.</p>`}</div>`;}).join('')}</div>
+    <p class="note">Misses happen when a fraudulent wire looks routine: a known payee name, a normal amount, and an older receiving account. The confirm step and analyst labels are how the system closes that gap over time.</p></section>`;
+
+  // ---- 6. limits ----
+  const s6 = `<section id="limits"><div class="sh"><span class="n">06</span><h2>What this does and doesn’t prove</h2></div>
+    <div class="card limits">
+      <p><b>Proves the approach works</b>Self-training on mostly unlabeled wires beats static rules on data shaped like Meridian’s problem.</p>
+      <p><b>Doesn’t forecast Meridian’s results</b>The data is synthetic. Real numbers need a back-test on Meridian’s labeled wire history.</p>
+      <p><b>Stays explainable</b>Logistic regression was chosen over more complex models so every decision has clear reasons for analysts and regulators.</p>
+      <p><b>Keeps humans in charge</b>The model never blocks a wire on its own, and thresholds change only with model-risk sign-off.</p>
+    </div></section>`;
+
+  $('main').innerHTML = `<div class="hero"><h1>How the fraud model learns</h1>
+      <p>Model ${esc(R.version)}, generated ${new Date(R.generatedAt).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})}. All figures come from synthetic data and are summaries only.</p>
+      <nav class="toc" aria-label="Sections"><a href="#data">The data</a><a href="#training">How it learned</a><a href="#signals">What it looks at</a><a href="#results">Results</a><a href="#examples">Right and wrong</a><a href="#limits">Limits</a></nav></div>
+    <div class="kpis">
+      <div class="kpi"><b>${semi.auc.toFixed(3)}</b><span>AUC on held-out wires</span><em>1.0 is perfect, 0.5 is guessing</em></div>
+      <div class="kpi"><b>${pct(semi.fraud_caught)}</b><span>Fraud stopped or challenged</span><em>Static rules: ${pct(rules.fraud_caught)}</em></div>
+      <div class="kpi"><b>${pct(semi.legit_challenged)}</b><span>Legitimate customers challenged</span><em>Static rules: ${pct(rules.legit_challenged)}</em></div>
+      <div class="kpi"><b>${pct(plAcc,1)}</b><span>Self-made labels that were correct</span><em>${n(ST.pseudo_labeled)} wires learned without answers</em></div>
+    </div>
+    ${s1}${s2}${s3}${s4}${s5}${s6}
+    <footer>View only. This page shows summaries of synthetic data; it can’t be copied, downloaded, or printed. Regenerate with <code>python -m ml.train</code> and <code>python -m ml.report</code>.</footer>`;
+}
+
+function roc(){
+  const S=300, P=34, sc=v=>P+v*(S-P*1.5), sy=v=>S-P-v*(S-P*1.5);
+  const line=(pts,color,w)=>`<polyline fill="none" stroke="${color}" stroke-width="${w}" stroke-linejoin="round" points="${pts.map(([x,y])=>`${sc(x).toFixed(1)},${sy(y).toFixed(1)}`).join(' ')}"/>`;
+  const ticks=[0,.25,.5,.75,1];
+  const [rx,ry]=R.roc.rules;
+  return `<svg viewBox="0 0 ${S} ${S}" role="img" aria-label="ROC curve. ML model AUC ${R.test.semi_supervised.auc.toFixed(3)}.">
+    ${ticks.map(t=>`<line x1="${sc(t)}" x2="${sc(t)}" y1="${sy(0)}" y2="${sy(1)}" stroke="var(--line)"/><line x1="${sc(0)}" x2="${sc(1)}" y1="${sy(t)}" y2="${sy(t)}" stroke="var(--line)"/>
+      <text x="${sc(t)}" y="${sy(0)+14}" font-size="10" text-anchor="middle" fill="var(--muted)">${t}</text><text x="${sc(0)-6}" y="${sy(t)+3}" font-size="10" text-anchor="end" fill="var(--muted)">${t}</text>`).join('')}
+    <line x1="${sc(0)}" y1="${sy(0)}" x2="${sc(1)}" y2="${sy(1)}" stroke="var(--grey)" stroke-dasharray="4 4"/>
+    ${line(R.roc.supervised,'var(--blue2)',2)}${line(R.roc.semi,'var(--blue)',2.5)}
+    <circle cx="${sc(rx)}" cy="${sy(ry)}" r="5.5" fill="var(--grey)" stroke="var(--surface)" stroke-width="2"/>
+    <text x="${sc(rx)+9}" y="${sy(ry)+4}" font-size="10.5" fill="var(--muted)">Rules</text>
+    <text x="${(sc(0)+sc(1))/2}" y="${S-4}" font-size="10.5" text-anchor="middle" fill="var(--muted)">Legitimate wires challenged</text>
+    <text x="10" y="${(sy(0)+sy(1))/2}" font-size="10.5" text-anchor="middle" fill="var(--muted)" transform="rotate(-90 10 ${(sy(0)+sy(1))/2})">Fraud caught</text>
+  </svg>`;
+}
+
+// ---- simulated employee sign-in (browser only, not real security) ----
+const EMP={'MCB-2041':{pw:'meridian-demo',role:'Fraud Analyst'}};
+let idle=null, signedIn=false;
+function signIn(id){signedIn=true; $('gate').hidden=true; $('app').hidden=false; $('emp-who').textContent=`${EMP[id].role} (${id})`; render(); resetIdle();}
+function signOut(msg){signedIn=false; $('app').hidden=true; $('main').innerHTML=''; $('gate').hidden=false; $('emp-pw').value=''; $('emp-err').hidden=!msg; if(msg) $('emp-err').textContent=msg; clearTimeout(idle);}
+function resetIdle(){clearTimeout(idle); if(signedIn) idle=setTimeout(()=>signOut('Signed out after 10 minutes of inactivity.'),10*60*1000);}
+$('login').addEventListener('submit',e=>{e.preventDefault(); const id=$('emp-id').value.trim().toUpperCase();
+  if(EMP[id]&&EMP[id].pw===$('emp-pw').value) signIn(id); else {$('emp-err').hidden=false; $('emp-err').textContent='Employee ID or password is incorrect.';}});
+$('signout').onclick=()=>signOut('');
+['click','keydown','scroll'].forEach(ev=>document.addEventListener(ev,resetIdle,true));
+['copy','cut','contextmenu','dragstart'].forEach(ev=>$('app').addEventListener(ev,e=>e.preventDefault()));
+window.addEventListener('beforeprint',()=>{if(signedIn) signOut('Signed out: printing model data isn’t allowed.');});
+})();
+</script>
+</body>
+</html>

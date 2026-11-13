@@ -15,8 +15,9 @@ fraud team's console on the other.
 | `ml/features.py` | The 13 model features and how they're transformed. Shared by training, the API, and the browser. |
 | `ml/train.py` | Trains the model with scikit-learn self-training, compares it with the alternatives, and saves the model. |
 | `ml/scoring.py` | Scores a wire: risk 0–1, top 3 reasons, lane (release / confirm / hold), next steps, voice policy. |
+| `ml/report.py` | Builds the summaries and charts for the **Model & data** page (`frontend/model_report.js`). |
 | `api/main.py` | FastAPI service: score wires, save analyst decisions as labels, retrain. No data-export endpoints. |
-| `frontend/` | The split-screen demo (`index.html`), the browser engine (`engine.js`), and trained weights (`model_weights.js`). |
+| `frontend/` | The split-screen demo (`index.html`), the **Model & data** page (`model.html`), the browser engine (`engine.js`), and generated files (`model_weights.js`, `model_report.js`). |
 | `tests/` | End-to-end tests: simulation, training quality, scoring, the API, and browser/Python parity. |
 | `.github/workflows/` | GitHub Actions: retrain and test on every push; publish the demo to GitHub Pages. |
 
@@ -84,13 +85,14 @@ python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\
 pip install -r requirements.txt
 
 python -m ml.train --regenerate     # simulate data + train (about 15 seconds)
-pytest -q                           # 9 tests
+python -m ml.report                 # build the Model & data page
+pytest -q                           # 10 tests
 ```
 
 **Option 1: demo only, model in the browser.**
 ```bash
 cd frontend && python -m http.server 5500
-# open http://localhost:5500
+# open http://localhost:5500  (Model & data page: http://localhost:5500/model.html)
 ```
 
 **Option 2: demo + live API (scoring, analyst labels, retraining).**
@@ -102,7 +104,7 @@ cd frontend && python -m http.server 5500         # terminal 2
 
 In API mode, each analyst Release or Block in the employee view is saved to `data/feedback.csv` as a new label. **Retrain with analyst labels** then trains a new model version that includes them.
 
-Demo employee sign-in: **MCB-2041 / meridian-demo**. This is simulated in the browser and is not real security.
+Demo employee sign-in (demo console and Model & data page): **MCB-2041 / meridian-demo**. This is simulated in the browser and is not real security.
 
 ## Put it on GitHub
 

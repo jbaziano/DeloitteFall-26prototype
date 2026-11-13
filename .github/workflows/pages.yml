@@ -27,6 +27,8 @@ jobs:
         run: pip install -r requirements.txt
       - name: Train so the demo uses freshly trained weights
         run: python -m ml.train --regenerate
+      - name: Build the Model & data page
+        run: python -m ml.report
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

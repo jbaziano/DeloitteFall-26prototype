@@ -6,7 +6,7 @@
 <title>Meridian wire fraud prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#EDF1F3; --surface:#FFFFFF; --ink:#13232A; --muted:#5A6B72; --line:#D6DFE3; --soft:#F3F6F7;
@@ -86,61 +86,85 @@ button,input,select{font:inherit;color:inherit}
 }
 
 /* ---------- customer (bank) ---------- */
-.bhead{background:var(--brand);color:var(--brand-ink)}
-.bhead .in{padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px}
-.bnav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
-.bnav span{padding:4px 9px;border-radius:6px;font-weight:600;font-size:13.5px;opacity:.8}
-.bnav span.on{background:rgba(255,255,255,.16);opacity:1}
-.bmain{max-width:720px;margin:0 auto;padding:22px 20px 48px}
-.crumb{color:var(--muted);font-size:14px;margin-bottom:4px}
-.bmain h1{font-size:26px;font-weight:800;margin:0 0 4px;letter-spacing:-.015em}
-.sub{color:var(--muted);margin:0 0 18px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px}
-.field{display:grid;gap:6px;margin-bottom:14px}
-.field label{font-weight:600;font-size:14px}
+.cust{--blue:#0B5FCF;--blue-dk:#08479C;--navy:#1B2453;--go:#0F9D58;--field:#5B6770;
+  --brand:var(--blue);--brand-ink:#FFFFFF;container-type:inline-size;
+  font-family:"Open Sans","Figtree",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cust{--blue:#3F86EE;--blue-dk:#2F6FD0;--navy:#141B3D;--field:#7D8A93}}
+:root[data-theme="dark"] .cust{--blue:#3F86EE;--blue-dk:#2F6FD0;--navy:#141B3D;--field:#7D8A93}
+.bhead{background:var(--surface);color:var(--ink)}
+.bhead .in{display:flex;align-items:center;gap:12px 26px;padding:14px 24px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;color:var(--blue)}
+.logo svg{flex:none}
+.logo b{display:block;font-size:21px;font-weight:800;letter-spacing:.09em;line-height:1}
+.logo small{display:block;font-size:9.5px;font-weight:700;letter-spacing:.24em;color:var(--muted);margin-top:4px}
+.topnav{display:flex;align-items:center;flex-wrap:wrap;font-size:13.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.topnav span{padding:0 14px;line-height:1}
+.topnav span+span{border-left:1px solid var(--line)}
+.bright{margin-left:auto;display:flex;align-items:center;gap:18px}
+.bright svg{color:var(--ink)}
+.pillgo{background:var(--go);color:#fff;font-weight:700;border-radius:999px;padding:9px 24px;font-size:14.5px;white-space:nowrap}
+.ubar{background:var(--navy);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:8px 20px;padding:0 24px;font-size:13.5px;flex-wrap:wrap}
+.bnav{display:flex;gap:4px}
+.bnav span{padding:10px 10px 8px;opacity:.82;border-bottom:3px solid transparent}
+.bnav span.on{opacity:1;font-weight:700;border-bottom-color:#fff}
+.util{display:flex;gap:22px;padding:8px 0}
+.util span{text-decoration:underline;text-underline-offset:3px}
+@container (max-width:860px){.topnav{display:none}}
+@container (max-width:520px){.util{display:none}.logo small{display:none}}
+.band{background:linear-gradient(var(--blue) 0 230px,transparent 230px)}
+.bmain{max-width:760px;margin:0 auto;padding:34px 22px 56px}
+.crumb{color:rgba(255,255,255,.85);font-size:14px;margin-bottom:6px;text-align:center}
+.bmain h1{font-size:clamp(28px,4.4cqi,40px);font-weight:600;margin:0 0 8px;letter-spacing:-.01em;color:#fff;text-align:center;line-height:1.15}
+.sub{color:rgba(255,255,255,.92);margin:0 0 26px;text-align:center;font-size:16px}
+.card{background:var(--surface);border:0;border-radius:26px;padding:30px 34px;box-shadow:0 10px 30px rgba(12,28,60,.16),0 1px 3px rgba(12,28,60,.12)}
+@container (max-width:560px){.card{padding:22px 20px;border-radius:20px}}
+.field{display:grid;gap:6px;margin-bottom:18px}
+.field label{font-weight:400;font-size:15px}
 .field .hint{font-size:13px;color:var(--muted)}
-.field input,.field select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
-@media (max-width:560px){.cols{grid-template-columns:1fr}}
+.field input,.field select{width:100%;padding:12px 14px;border:1px solid var(--field);border-radius:4px;background:var(--surface);font-size:15.5px}
+.field input:focus,.field select:focus{border-color:var(--blue);outline:2px solid var(--blue);outline-offset:0}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+@container (max-width:560px){.cols{grid-template-columns:1fr}}
 .money{position:relative}
-.money span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
-.money input{padding-left:24px;font-size:19px;font-weight:700}
-.newpayee{border-top:1px dashed var(--line);padding-top:14px;margin-top:2px}
-.newpayee h3{margin:0 0 10px;font-size:15px}
-.actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:6px;flex-wrap:wrap}
-.btn{border:1px solid var(--brand);background:var(--brand);color:var(--brand-ink);padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer}
-.btn.sec{background:transparent;color:var(--brand)}
-.link{background:none;border:0;color:var(--brand);font-weight:600;cursor:pointer;padding:6px 4px}
-dl.sum{display:grid;grid-template-columns:150px 1fr;gap:8px 14px;margin:0}
-@media (max-width:520px){dl.sum{grid-template-columns:1fr;gap:2px}dl.sum dd{margin-bottom:8px}}
+.money span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:17px}
+.money input{padding-left:28px;font-size:20px;font-weight:700}
+.newpayee{border-top:1px solid var(--line);padding-top:18px;margin-top:2px}
+.newpayee h3{margin:0 0 12px;font-size:17px;font-weight:700}
+.actions{display:flex;gap:12px;justify-content:flex-end;align-items:center;margin-top:8px;flex-wrap:wrap}
+.btn{border:2px solid var(--blue);background:var(--blue);color:#fff;padding:11px 30px;border-radius:999px;font-weight:700;font-size:16px;letter-spacing:.01em;cursor:pointer}
+.btn:hover{background:var(--blue-dk);border-color:var(--blue-dk)}
+.btn.sec{background:transparent;color:var(--blue)}
+.btn.sec:hover{background:color-mix(in srgb,var(--blue) 8%,transparent)}
+.link{background:none;border:0;color:var(--blue);font-weight:600;cursor:pointer;padding:6px 4px;text-decoration:underline;text-underline-offset:3px}
+dl.sum{display:grid;grid-template-columns:150px 1fr;gap:12px 16px;margin:0}
+@container (max-width:520px){dl.sum{grid-template-columns:1fr;gap:2px}dl.sum dd{margin-bottom:10px}}
 dl.sum dt{color:var(--muted)} dl.sum dd{margin:0;font-weight:600}
-.total{font-size:21px;font-weight:800}
-.notice{display:flex;gap:12px;align-items:flex-start;border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.total{font-size:22px;font-weight:800}
+.notice{display:flex;gap:14px;align-items:flex-start;border-radius:18px;padding:18px 20px;margin-bottom:16px;box-shadow:0 6px 20px rgba(12,28,60,.12)}
 .notice.ok{background:var(--ok-bg);color:var(--ok)} .notice.warn{background:var(--warn-bg);color:var(--warn)} .notice.bad{background:var(--bad-bg);color:var(--bad)}
-.notice h2{margin:0;font-size:18px} .notice p{margin:2px 0 0;color:var(--ink)}
+.notice h2{margin:0;font-size:19px;font-weight:700} .notice p{margin:3px 0 0;color:var(--ink)}
 .notice svg{flex:none;margin-top:2px}
-.screen{text-align:center;padding:48px 20px}
-.spin{width:40px;height:40px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--brand);margin:0 auto 16px;animation:sp .9s linear infinite}
+.screen{text-align:center;padding:52px 20px}
+.spin{width:42px;height:42px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--brand);margin:0 auto 16px;animation:sp .9s linear infinite}
 .spin.sm{width:16px;height:16px;border-width:2px;margin:0;display:inline-block;vertical-align:-3px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .stepper{list-style:none;padding:0;margin:0}
-.stepper li{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:0 0 18px;position:relative}
-.stepper li:not(:last-child)::after{content:"";position:absolute;left:13.5px;top:30px;bottom:4px;width:1px;background:var(--line)}
-.dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+.stepper li{display:grid;grid-template-columns:30px 1fr;gap:14px;padding:0 0 20px;position:relative}
+.stepper li:not(:last-child)::after{content:"";position:absolute;left:14.5px;top:32px;bottom:4px;width:2px;background:var(--line)}
+.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--soft);color:var(--muted);border:2px solid var(--line)}
 .stepper li.done .dot{background:var(--ok);color:#fff;border-color:var(--ok)}
 .stepper li.fail .dot{background:var(--bad);color:#fff;border-color:var(--bad)}
 .stepper li.now .dot{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
-.stepper h3{margin:2px 0 2px;font-size:15.5px}
-.stepper p{margin:0 0 8px;color:var(--muted)}
+.stepper h3{margin:3px 0 2px;font-size:16.5px;font-weight:700}
+.stepper p{margin:0 0 10px;color:var(--muted)}
 .stepper li.wait h3{color:var(--muted)}
 .waiting{color:var(--brand);font-weight:600;font-size:14px}
 .demo{display:inline-block;font-size:11.5px;font-weight:700;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:0 6px;margin-right:6px;vertical-align:middle}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.inline-input{display:flex;gap:8px;flex-wrap:wrap}
-.inline-input input{flex:1;min-width:180px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.inline-input{display:flex;gap:10px;flex-wrap:wrap}
+.inline-input input{flex:1;min-width:180px;padding:11px 14px;border:1px solid var(--field);border-radius:4px;background:var(--surface);font-size:15.5px}
 .err{color:var(--bad);font-size:14px;margin:6px 0 0}
-.vbanner{display:flex;gap:10px;align-items:center;background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:9px 13px;margin:-6px 0 14px;font-weight:600;font-size:14px}
+.vbanner{display:flex;gap:10px;align-items:center;justify-content:center;background:var(--warn-bg);color:var(--warn);border-radius:999px;padding:9px 18px;margin:-10px auto 18px;font-weight:600;font-size:14px;width:fit-content;max-width:100%}
 
 /* ---------- employee ---------- */
 .emain{padding:18px 18px 40px}
@@ -212,6 +236,7 @@ pre.json{background:var(--e-bg);border:1px solid var(--e-line);border-radius:6px
     <div class="chips" id="scen" role="group" aria-label="Scenario"></div>
     <div class="seg" role="group" aria-label="Request channel"><button type="button" id="c-online" aria-pressed="true">Online</button><button type="button" id="c-voice" aria-pressed="false">Voice call</button></div>
     <button type="button" class="dlink" id="more" aria-expanded="false" aria-controls="drawer">Adjust signals</button>
+    <a class="dlink" href="model.html" style="text-decoration:none;color:inherit">Model &amp; data</a>
     <span class="preview" id="preview"></span>
   </div>
   <div class="drawer" id="drawer" hidden>
@@ -257,11 +282,18 @@ pre.json{background:var(--e-bg);border:1px solid var(--e-line);border-radius:6px
   <section class="pane cust" id="pane-c" aria-label="Customer view">
     <div class="plabel">Customer view: Meridian online banking</div>
     <div class="pscroll">
-      <header class="bhead"><div class="in">
-        <div class="logo"><svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 19 L11 9 L14 16 L17 9 L21 19" fill="none" stroke="var(--gold)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg>Meridian Community Bank</div>
-        <nav class="bnav" aria-label="Banking"><span>Accounts</span><span class="on">Wires</span><span>Statements</span></nav>
-      </div></header>
-      <main class="bmain" id="app"></main>
+      <header class="bhead">
+        <div class="in">
+          <div class="logo"><svg width="34" height="34" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M7 19 L11 9 L14 16 L17 9 L21 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg><span><b>MERIDIAN</b><small>COMMUNITY BANK</small></span></div>
+          <nav class="topnav" aria-label="Bank sections"><span>Personal</span><span>Business</span><span>Commercial</span><span>Wealth Management</span></nav>
+          <div class="bright"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="7" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg><span class="pillgo">Log Out</span></div>
+        </div>
+        <div class="ubar">
+          <nav class="bnav" aria-label="Banking"><span>Accounts</span><span class="on">Wires</span><span>Statements</span></nav>
+          <div class="util"><span>Customer Service</span><span>Branch &amp; ATM Locator</span></div>
+        </div>
+      </header>
+      <div class="band"><main class="bmain" id="app"></main></div>
     </div>
   </section>
 

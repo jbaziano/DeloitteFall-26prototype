@@ -138,3 +138,14 @@ def test_browser_engine_matches_python():
     for (s, lane), wire in zip(out, wires):
         py = scoring.score(wire, weights=W)
         assert math.isclose(s, py["score"], abs_tol=1e-4) and lane == py["lane"]
+
+
+def test_model_report_has_summaries_only(trained, tmp_path):
+    from ml.report import build
+    base, _ = trained
+    r = build(data_dir=base / "data", artifacts=base / "artifacts", frontend=tmp_path)
+    assert (tmp_path / "model_report.js").exists()
+    assert r["data"]["wires"] > 10000 and len(r["features"]) == 13 and len(r["examples"]) == 6
+    assert sum(h["legit"] + h["fraud"] for h in r["histogram"]) == r["split"]["test"]
+    text = (tmp_path / "model_report.js").read_text()
+    assert "customer_id" not in text and "beneficiary_account" not in text   # no identifiers, summaries only

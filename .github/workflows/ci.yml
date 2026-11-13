@@ -20,6 +20,8 @@ jobs:
         run: pip install -r requirements.txt
       - name: Simulate data and train the model
         run: python -m ml.train --regenerate
+      - name: Build the Model & data page
+        run: python -m ml.report
       - name: Run tests
         run: pytest -q
       - name: Keep model metrics and weights (no data)
