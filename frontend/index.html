@@ -6,7 +6,7 @@
 <title>Meridian wire fraud prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700;800&family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#EDF1F3; --surface:#FFFFFF; --ink:#13232A; --muted:#5A6B72; --line:#D6DFE3; --soft:#F3F6F7;
@@ -226,6 +226,81 @@ pre.json{background:var(--e-bg);border:1px solid var(--e-line);border-radius:6px
 .nocopy input{-webkit-user-select:text;user-select:text}
 @media print{.emp{display:none!important}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- theme overrides (presentation only) ---------- */
+/* presenter toolbar */
+html:root:root{--d-bg:#24282C;--d-ink:#E7E9EB;--d-line:#4A5157}
+.demobar{border-bottom:1px solid #000;padding:7px 14px}
+.dtag{font-size:12px;letter-spacing:0;text-transform:none;opacity:.6;font-weight:600}
+.chip,.seg,.dlink{border-radius:3px}
+.chip{padding:3px 9px}
+.preview{opacity:.9}
+/* window chrome */
+.plabel{text-transform:none;letter-spacing:0;font-weight:400;font-size:12.5px;padding:6px 10px;gap:10px;justify-content:space-between}
+.addr{flex:1;min-width:0;display:flex;align-items:center;gap:7px;padding:3px 10px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:"Source Sans 3",system-ui,sans-serif;font-size:13px}
+.role{font-size:11.5px;font-weight:600;white-space:nowrap;opacity:.75}
+.cust .plabel{background:#DDE2E7;color:#3B4650;border-bottom:1px solid #C3CBD3}
+.cust .addr{background:#fff;color:#2B343C}
+.emp .plabel{background:#CBD2D9;color:#2E3A45;border-bottom:1px solid #AEB8C2}
+.emp .addr{background:#F4F6F8;color:#26313B}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cust .plabel,:root:not([data-theme="light"]) .emp .plabel{background:#20272D;color:#AEB9C3;border-bottom-color:#11161A}
+  :root:not([data-theme="light"]) .cust .addr,:root:not([data-theme="light"]) .emp .addr{background:#2C353D;color:#D6DEE5}}
+/* customer: bank-style alerts */
+.notice{background:var(--surface)!important;border-radius:6px;border-left:6px solid currentColor;box-shadow:0 2px 10px rgba(12,28,60,.10)}
+.notice h2{font-size:18px}
+.vbanner{border-radius:4px;justify-content:flex-start;border-left:4px solid currentColor;margin:-8px auto 18px}
+.demo{border-style:solid;border-radius:2px;text-transform:uppercase;font-size:10.5px;letter-spacing:.04em}
+/* employee: case-management screen */
+.emp{--e-bg:#E8ECF0;--e-surface:#FFFFFF;--e-ink:#1F2A33;--e-muted:#5C6975;--e-line:#C9D1D9;--e-head:#F2F4F7;--e-row:#E7EFFB;
+  --pri:#0B5FCF;--tg:#2E7D32;--ta:#8A5D00;--tr:#B3261E;
+  font-family:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14.5px;border-left:1px solid #9AA6B1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .emp{--e-bg:#12181D;--e-surface:#1A2229;--e-ink:#DCE3E9;--e-muted:#91A0AD;--e-line:#2F3B45;--e-head:#202A32;--e-row:#1E3048;
+  --pri:#4C8DF0;--tg:#7CCB80;--ta:#F2C14E;--tr:#FF8A7D;border-left-color:#000}}
+.emp .lane.release,.emp .tl .k-ok{color:var(--tg)}
+.emp .lane.confirm,.emp .tl .k-warn,.emp .policy{color:var(--ta)}
+.emp .lane.hold,.emp .tl .k-bad,.emp .sigs .hot,.emp .gerr{color:var(--tr)}
+.emp .ebtn.bad{border-color:var(--tr);color:var(--tr)}
+.emain{padding:0 0 30px}
+.ehead{background:#1B2453;color:#fff;margin:0 0 12px;padding:9px 14px}
+.ehead h2{font-size:15px;font-weight:600}
+.ehead .ewho{color:#C9D2F0}
+.ehead .ebtn.sm{border-color:rgba(255,255,255,.45);color:#fff}
+.emain>.ebox,.emain>.empty,.emain>p{margin-left:12px;margin-right:12px}
+.ebox{border-radius:3px;padding:10px 14px 12px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.ebox h3{background:var(--e-head);border-bottom:1px solid var(--e-line);margin:-10px -14px 10px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--e-ink);text-transform:none;letter-spacing:0;border-radius:3px 3px 0 0}
+details summary{font-size:13px;font-weight:600;color:var(--e-ink);text-transform:none;letter-spacing:0}
+.ebtn{border-radius:3px;font-weight:600}
+.ebtn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.ebtn.bad{background:var(--e-surface)}
+.empty{border-radius:3px;background:var(--e-surface);border-style:solid}
+.gate{background:var(--e-surface);border:1px solid var(--e-line);border-radius:3px;padding:20px 22px;margin:28px auto}
+.gate input{border-radius:3px;background:var(--e-surface)}
+.gate .ebtn.pri{border-radius:3px}
+.caseid{font-family:"Source Code Pro",ui-monospace,Menlo,Consolas,monospace;font-size:15px;font-weight:600}
+.pill{border-radius:2px;border:0;padding:2px 8px;font-size:12px;font-weight:600}
+.st-sent{background:#DFF1DC;color:#1E5E1A} .st-wait{background:#FFF0C2;color:#6E4F00} .st-act{background:#F28C28;color:#fff}
+.st-blocked{background:#F8D9D4;color:#94231A} .st-cancel,.st-scoring{background:#E3E7EB;color:#4E5A64}
+.kv{font-size:14px}
+.amt{font-size:22px;font-weight:700}
+.scorewrap b{font-size:38px;font-weight:700;letter-spacing:-.01em}
+.lane{font-size:16px;font-weight:700}
+.rail .bands{border-radius:1px}
+.reasons li span:first-child{display:inline-grid;place-items:center;flex:none;width:19px;height:19px;border-radius:2px;background:var(--e-bg);color:var(--e-ink);font-size:11.5px;font-weight:700}
+.action{border:1px solid #E3B341;border-left:5px solid #E3A008;background:#FFF9E8}
+.action h3{background:#FFEFC2;color:#5F4500;border-bottom-color:#F0D58A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .action{background:#2A2414;border-color:#6B5520}
+  :root:not([data-theme="light"]) .action h3{background:#3A3018;color:#F2C14E;border-bottom-color:#6B5520}}
+.tl{font-size:13.5px}
+.tl li{grid-template-columns:92px 1fr;padding:4px 0}
+.tl time{font-family:"Source Code Pro",ui-monospace,Menlo,Consolas,monospace;font-size:12px;padding-top:1px}
+.sigs{gap:0;font-size:13.5px}
+.sigs span{padding:3px 0;border-bottom:1px solid var(--e-line)}
+pre.json{border-radius:2px;background:var(--e-head);font-family:"Source Code Pro",ui-monospace,Menlo,Consolas,monospace}
+.hist td{padding:6px 6px}
+.hist tr:hover td{background:var(--e-head)}
+.hist tr[aria-current="true"] td{background:var(--e-row)}
+.hist tr[aria-current="true"] td:first-child{box-shadow:inset 3px 0 0 var(--pri)}
+.hist b{font-family:"Source Code Pro",ui-monospace,Menlo,Consolas,monospace;font-weight:600}
 </style>
 </head>
 <body>
@@ -280,7 +355,7 @@ pre.json{background:var(--e-bg);border:1px solid var(--e-line);border-radius:6px
 
 <div class="split">
   <section class="pane cust" id="pane-c" aria-label="Customer view">
-    <div class="plabel">Customer view: Meridian online banking</div>
+    <div class="plabel"><span class="addr"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2" fill="currentColor"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>online.meridian-bank.demo/wires/send</span><span class="role">Customer</span></div>
     <div class="pscroll">
       <header class="bhead">
         <div class="in">
@@ -298,7 +373,7 @@ pre.json{background:var(--e-bg);border:1px solid var(--e-line);border-radius:6px
   </section>
 
   <section class="pane emp" id="pane-e" aria-label="Employee view" data-hide-mobile>
-    <div class="plabel">Employee view: Fraud operations console</div>
+    <div class="plabel"><span class="addr"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2" fill="currentColor"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>fraudops.meridian.internal/wire-cases</span><span class="role">Bank employee</span></div>
     <div class="pscroll nocopy" id="emp"></div>
   </section>
 </div>

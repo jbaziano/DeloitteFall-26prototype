@@ -6,7 +6,7 @@
 <title>Meridian fraud model: data and training</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#F2F4F7; --surface:#FFFFFF; --ink:#16212B; --muted:#5D6B78; --line:#DCE2E8; --soft:#F6F8FA;
@@ -155,6 +155,39 @@ footer{font-size:13px;color:var(--muted);margin-top:44px;border-top:1px solid va
 .gcard small{display:block;color:var(--muted);font-size:12.5px;margin-top:14px}
 .secure{-webkit-user-select:none;user-select:none}
 @media print{body{display:none!important}}
+
+/* ---------- report styling overrides (presentation only) ---------- */
+body{font-family:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15.5px}
+.top .in{padding:8px 24px}
+.tnav a{border-radius:2px}
+.who button{border-radius:2px}
+.hero{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--navy);padding:20px 24px 16px;border-radius:2px}
+.hero h1{font-size:28px;font-weight:600;letter-spacing:0}
+.hero h1::before{content:"Model performance report";display:block;font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.toc{gap:4px 18px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.toc a{border:0;background:none;border-radius:0;padding:0;color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+.kpis{gap:0;border:1px solid var(--line);background:var(--surface);border-radius:2px;margin-top:16px}
+.kpi{border:0;border-left:1px solid var(--line);border-radius:0;padding:14px 18px}
+.kpi:first-child{border-left:0}
+@media (max-width:900px){.kpi:nth-child(3){border-left:0}.kpi:nth-child(n+3){border-top:1px solid var(--line)}}
+.kpi b{font-size:28px;font-weight:700;letter-spacing:0;font-family:"Source Code Pro",ui-monospace,Menlo,Consolas,monospace}
+section{margin-top:38px}
+.sh{border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:12px}
+.sh .n{font-family:"Source Code Pro",ui-monospace,Menlo,Consolas,monospace;color:var(--muted);font-weight:600}
+.sh h2{font-size:21px;font-weight:600}
+.card,.stats,.exc,.audit div{border-radius:2px}
+.card h3{font-size:15px;font-weight:600;padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.stats b,.audit b,.exc .sc b{font-family:"Source Code Pro",ui-monospace,Menlo,Consolas,monospace;font-weight:600}
+.bar .t,.bar .t i,.rd .t,.hrow .t,.wbar i,.split,.legend i{border-radius:1px}
+.pill{border-radius:2px}
+tbody tr:nth-child(even) td{background:var(--soft)}
+th{text-transform:none;background:var(--soft);border-bottom:2px solid var(--line)}
+.exc{border-top-width:3px}
+.exc .v{letter-spacing:.03em}
+.gcard{border-radius:3px}
+.gcard input{border-radius:2px}
+.gcard button{border-radius:3px}
+footer{border-top:2px solid var(--ink)}
 </style>
 </head>
 <body>
