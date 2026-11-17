@@ -38,7 +38,7 @@ flowchart LR
   I --> J{Lane}
   J -- under 0.05 --> K[Release]
   J -- 0.05 to 0.40 --> L[Confirm: passkey + payee name]
-  J -- 0.40 and up --> M[Hold: Okta, trusted contact, analyst]
+  J -- 0.40 and up --> M[Hold: Meridian app verification, trusted contact, analyst]
   M -- analyst decision --> N[New label] --> E
 ```
 
@@ -156,7 +156,7 @@ Set `API_KEY` to require an `X-API-Key` header on `/feedback` and `/retrain`. Se
 
 This is a prototype. Before production it would need:
 
-- Real authentication: Okta single sign-on and role-based access on the API, replacing the browser-only sign-in.
+- Real authentication: single sign-on and role-based access on the API, replacing the browser-only sign-in.
 - Training and back-testing on Meridian's own data, with model-risk review (for example SR 11-7).
 - Monitoring for drift, plus champion/challenger runs before a retrained model replaces the current one.
 - Encryption and retention controls for feedback and audit logs.

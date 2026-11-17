@@ -401,6 +401,7 @@ const PAYEES=[
   {id:'midstate',name:'Midstate Steel Supply',bank:'First Merchants Bank',mask:'3391',country:'United States',age:1460,senders:2,bankchg:false,first:false,last:'Oct 2, 2026'},
   {id:'granite',name:'Granite Point Consulting',bank:'Metro Credit Union',mask:'9914',country:'United States',age:21,senders:3,bankchg:true,first:false,last:'Sep 18, 2026',note:'Bank details updated Oct 28'},
   {id:'heartland',name:'Heartland Title & Escrow',bank:'Old National Bank',mask:'0187',country:'United States',age:2900,senders:18,bankchg:false,first:true,last:null},
+  {id:'coleman',name:'Robin Theodore Coleman',bank:'Huntington National Bank',mask:'5562',country:'United States',age:3100,senders:1,bankchg:false,first:false,last:'Aug 29, 2026'},
 ];
 const COUNTRIES=['United States','Canada','Mexico','United Kingdom','Hong Kong','United Arab Emirates','Nigeria'];
 const CLEAN={usual:9000,off:false,debt:.30,newip:false,typing:.12,remote:false,sim:false,mule:false,contact:false,newAge:12,newSenders:2};
@@ -482,9 +483,9 @@ function scoreCase(c){
   if(c.result.policy) ev(c,`Voice policy: routed to Confirm (score alone said ${LN[c.result.scoreLane]})`,'k-warn');
   if(c.lane==='release'){c.status='sent'; c.lane='release'; ev(c,'Released automatically','k-ok'); sendFed(c);}
   else if(c.lane==='confirm'){c.status='cust'; ev(c,`Routed to Confirm. ${c.w.newDevice||c.result.policy?'Passkey request pushed to verified iPhone':'Customer asked for a passkey'}`,'k-warn');}
-  else {c.status='cust'; ev(c,'Wire held. Customer asked to verify identity with Okta','k-bad');}
+  else {c.status='cust'; ev(c,'Wire held. Verification needed on Meridian app','k-bad');}
 }
-function toHold(c,why){c.lane='hold'; c.res=[]; c.status='cust'; ev(c,`${why}. Moved to Hold; customer asked to verify with Okta`,'k-bad');}
+function toHold(c,why){c.lane='hold'; c.res=[]; c.status='cust'; ev(c,`${why}. Moved to Hold; verification needed on Meridian app`,'k-bad');}
 function sendFed(c){c.status='sent'; c.conf='MCB'+String(Math.floor(1e7+Math.random()*9e7));
   c.imad=new Date().toISOString().slice(0,10).replace(/-/g,'')+'B1QGC08C'+String(Math.floor(Math.random()*1e6)).padStart(6,'0');
   ev(c,`Sent via Fedwire, ref ${c.imad}`,'k-ok');}
@@ -577,8 +578,8 @@ function holdView(c){const cur=c.res.length;
   const waitLine=t=>`<p class="waiting"><span class="spin sm" aria-hidden="true"></span>${t}</p>`;
   return `<div class="notice bad">${ICON.lock}<div><h2>We’ve paused this wire</h2><p>Your ${usd(c.w.amount)} wire to ${esc(c.w.payee)} needs extra verification. No money has left your account.</p></div></div>
   <div class="card"><ol class="stepper">
-    <li class="${cls(0,c)}"><span class="dot">1</span><div><h3>Verify your identity with Okta</h3><p>Open Okta Verify on your registered device and complete the check.</p>
-      ${cur===0?`<div class="row"><span class="demo">Demo</span><button class="btn" data-act="okta-ok">Complete verification</button><button class="link" data-act="okta-fail">Can’t verify</button></div>`:''}</div></li>
+    <li class="${cls(0,c)}"><span class="dot">1</span><div><h3>Verification needed on Meridian app</h3><p>Open the Meridian app on your registered device and complete the verification.</p>
+      ${cur===0?`<div class="row"><span class="demo">Demo</span><button class="btn" data-act="verify-ok">Complete verification</button><button class="link" data-act="verify-fail">Can’t verify</button></div>`:''}</div></li>
     <li class="${cls(1,c)}"><span class="dot">2</span><div><h3>We call your trusted contact</h3><p>Meridian will call the trusted contact on your account to confirm this request.</p>
       ${cur===1?waitLine('Our team is calling now. You don’t need to do anything.'):''}</div></li>
     <li class="${cls(2,c)}"><span class="dot">3</span><div><h3>A fraud specialist reviews the wire</h3><p>Usually within 30 minutes during business hours. We’ll email you the outcome.</p>
@@ -603,10 +604,10 @@ $('app').addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if
       else {c.attempts++; ev(c,`Payee name mismatch: customer entered “${v.slice(0,40)}”`,'k-bad');
         if(c.attempts>=2){c.nameErr=''; toHold(c,'Second payee-name mismatch');} else c.nameErr='That doesn’t match the name on the receiving account. Check with the payee and try once more.';}
       break; }
-    case 'okta-ok': c.res.push('ok'); ev(c,'Okta identity verification passed','k-ok');
+    case 'verify-ok': c.res.push('ok'); ev(c,'Meridian app verification passed','k-ok');
       if(c.w.contactChanged){c.res.push('fail'); block(c,'Trusted contact changed in the last 2 weeks, so it can’t be used');}
       else {c.status='staff'; ev(c,'Waiting for staff to call the trusted contact','k-warn');} break;
-    case 'okta-fail': c.res.push('fail'); ev(c,'Okta identity verification failed','k-bad'); block(c,'Identity not confirmed'); break;
+    case 'verify-fail': c.res.push('fail'); ev(c,'Meridian app verification failed','k-bad'); block(c,'Identity not confirmed'); break;
   }
   renderAll();});
 $('app').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='nm'){e.preventDefault(); document.querySelector('[data-act="name"]').click();}});
@@ -665,7 +666,7 @@ function caseView(c){
   let action='';
   if(c.status==='staff' && c.res.length===1) action=`<div class="ebox action"><h3>Your action: call the trusted contact</h3><p>Call Jordan Whitfield at (317) 555-0187, the trusted contact on file (unchanged for 14+ months). Ask them to confirm the customer is sending ${usd0(c.w.amount)} to ${esc(c.w.payee)}.</p>
     <div class="row"><button class="ebtn pri" data-e="tc-ok">Contact confirms</button><button class="ebtn bad" data-e="tc-fail">Contact doesn’t confirm</button></div></div>`;
-  if(c.status==='staff' && c.res.length===2) action=`<div class="ebox action"><h3>Your action: release or block</h3><p>Okta and the trusted contact both passed. Review the reasons and signals, then decide. The customer is waiting.</p>
+  if(c.status==='staff' && c.res.length===2) action=`<div class="ebox action"><h3>Your action: release or block</h3><p>Meridian app verification and the trusted contact both passed. Review the reasons and signals, then decide. The customer is waiting.</p>
     <div class="row"><button class="ebtn pri" data-e="an-ok">Release wire</button><button class="ebtn bad" data-e="an-fail">Block wire</button></div></div>`;
   return `<div class="ebox"><div class="casehead"><div><div class="caseid">${c.id}</div><div class="esmall">Received ${c.at}${c.w.channel==='voice'?', by phone':', online banking'}</div></div>${statusPill(c)}</div>
       <dl class="kv"><dt>Customer</dt><dd>${esc(c.w.customer)}</dd><dt>From</dt><dd>${esc(c.w.from)}</dd><dt>To</dt><dd>${esc(c.w.payee)}<div class="esmall">${esc(c.w.bank)} ••${esc(c.w.mask||'----')}, ${esc(c.w.country)}</div></dd><dt>Amount</dt><dd class="amt">${usd(c.w.amount)}</dd></dl></div>

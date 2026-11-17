@@ -68,7 +68,7 @@
       { title: 'Customer confirms the payee name', detail: 'Matched to the beneficiary account name before release.' },
       { title: 'Release, or move to hold if either step fails', detail: 'Outcome is logged as a label.' }];
     return [
-      { title: 'Hold the wire and step up identity (Okta)', detail: 'Phishing-resistant re-verification.' },
+      { title: 'Hold the wire: verification needed on Meridian app', detail: 'Customer re-verifies identity in the Meridian app on their registered device.' },
       { title: 'Call the trusted contact on file', detail: 'Only a contact unchanged for at least ~2 weeks is used.' },
       { title: 'Analyst decides; otherwise blocked', detail: 'If identity can’t be confirmed, the customer sends in person.' }];
   }
