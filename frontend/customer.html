@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meridian customer review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E8ECF0; --surface:#FFFFFF; --ink:#1F2A33; --muted:#5C6975; --line:#C9D1D9; --head:#F2F4F7; --soft:#F6F8FA;
+  --navy:#1B2453; --pri:#0B5FCF; --bar:#2F6FD0; --band:#E3EDFB;
+  --tg:#2E7D32; --ta:#8A5D00; --tr:#B3261E; --dg:#5E9E10; --da:#E0A100; --dr:#D9472F; --focus:#2F6FDB;
+  color-scheme:light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#12181D; --surface:#1A2229; --ink:#DCE3E9; --muted:#91A0AD; --line:#2F3B45; --head:#202A32; --soft:#1D262E;
+  --navy:#121936; --pri:#4C8DF0; --bar:#5B9BF2; --band:#1E3048;
+  --tg:#7CCB80; --ta:#F2C14E; --tr:#FF8A7D; --dg:#86BC25; --da:#F2B620; --dr:#FF7A63; --focus:#7FA8FF; color-scheme:dark;}}
+:root[data-theme="dark"]{--paper:#12181D; --surface:#1A2229; --ink:#DCE3E9; --muted:#91A0AD; --line:#2F3B45; --head:#202A32; --soft:#1D262E;
+  --navy:#121936; --pri:#4C8DF0; --bar:#5B9BF2; --band:#1E3048; --tg:#7CCB80; --ta:#F2C14E; --tr:#FF8A7D; --dg:#86BC25; --da:#F2B620; --dr:#FF7A63; color-scheme:dark;}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--navy);z-index:10}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.mono{font-family:"Source Code Pro",ui-monospace,Menlo,Consolas,monospace}
+/* gate */
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.gcard{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--navy);border-radius:3px;padding:24px}
+.gcard .kick{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.gcard h1{font-size:21px;margin:2px 0 4px}
+.gcard p{color:var(--muted);font-size:14px;margin:0 0 12px}
+.gcard label{display:block;font-size:13.5px;font-weight:600;margin:12px 0 4px}
+.gcard input,.gcard select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+.gcard button{width:100%;margin-top:18px;padding:10px;border:0;border-radius:3px;background:var(--pri);color:#fff;font-weight:700;cursor:pointer}
+.gerr{color:var(--tr);font-size:13.5px;margin:10px 0 0}
+.gcard small{display:block;color:var(--muted);font-size:12.5px;margin-top:14px;line-height:1.45}
+/* page */
+.top{background:var(--navy);color:#fff;position:sticky;top:0;z-index:5}
+.top .in{max-width:1240px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.06em}
+.logo small{display:block;font-size:9px;letter-spacing:.2em;opacity:.75}
+.who{margin-left:auto;font-size:13px;display:flex;gap:10px;align-items:center;color:#C9D2F0;flex-wrap:wrap}
+.who button{background:none;border:1px solid rgba(255,255,255,.45);color:#fff;border-radius:3px;padding:2px 10px;cursor:pointer;font-size:12.5px}
+.reasonbar{background:#FFF4D6;color:#5F4500;border-bottom:1px solid #F0D58A;font-size:13.5px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .reasonbar{background:#2A2414;color:#F2C14E;border-bottom-color:#6B5520}}
+.reasonbar .in{max-width:1240px;margin:0 auto;padding:6px 20px}
+main{max-width:1240px;margin:0 auto;padding:18px 20px 60px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:3px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.05);min-width:0}
+.box>h2{margin:0;padding:7px 14px;font-size:14px;font-weight:600;background:var(--head);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.box>h2 span{font-weight:400;color:var(--muted);font-size:13px}
+.bd{padding:12px 14px}
+.prof{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(4,minmax(0,1fr));gap:0}
+.prof>div{padding:12px 14px;border-left:1px solid var(--line)}
+.prof>div:first-child{border-left:0}
+.prof b{display:block;font-size:15.5px}
+.prof .nm{font-size:22px;font-weight:700;line-height:1.2}
+.prof span{font-size:13px;color:var(--muted)}
+@media (max-width:900px){.prof{grid-template-columns:1fr 1fr}.prof>div:nth-child(odd){border-left:0}.prof>div:nth-child(n+2){border-top:1px solid var(--line)}.prof>div:first-child{grid-column:1/-1}}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.kpis div{padding:12px 14px;border-left:1px solid var(--line)}
+.kpis div:first-child{border-left:0}
+.kpis b{display:block;font-family:"Source Code Pro",ui-monospace,Menlo,monospace;font-size:24px;font-weight:600}
+.kpis span{font-size:13px;color:var(--muted)}
+@media (max-width:900px){.kpis{grid-template-columns:1fr 1fr}.kpis div{border-top:1px solid var(--line)}.kpis div:nth-child(odd){border-left:0}.kpis div:first-child{grid-column:1/-1;border-top:0}}
+.summary{margin:0;padding-left:18px}
+.summary li{margin:4px 0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.grid3{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px}
+@media (max-width:980px){.grid2,.grid3{grid-template-columns:1fr}}
+svg.ch{display:block;width:100%;height:auto}
+.ch text{fill:var(--muted);font-size:11px;font-family:"Source Sans 3",sans-serif}
+.ch .grid{stroke:var(--line)}
+.ch .hit{fill:transparent;cursor:default}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.legend i.sq{border-radius:2px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12.5px;padding:6px 9px;border-radius:3px;z-index:20;max-width:280px;line-height:1.4}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;font-weight:600;color:var(--muted);background:var(--head);white-space:nowrap}
+td.r,th.r{text-align:right}
+tbody tr:last-child td{border-bottom:0}
+.tbl{overflow-x:auto}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:1px 7px;border-radius:2px;white-space:nowrap}
+.t-release{background:#DFF1DC;color:#1E5E1A} .t-confirm{background:#FFF0C2;color:#6E4F00} .t-hold{background:#F8D9D4;color:#94231A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .t-release{background:#1B3020;color:#7CCB80}:root:not([data-theme="light"]) .t-confirm{background:#3A2F12;color:#F2C14E}:root:not([data-theme="light"]) .t-hold{background:#3B1E1B;color:#FF8A7D}}
+.out-bad{color:var(--tr);font-weight:600} .out-ok{color:var(--tg)}
+.fl{display:inline-block;font-size:11.5px;border:1px solid var(--line);border-radius:2px;padding:0 5px;margin:0 3px 2px 0;color:var(--muted);white-space:nowrap}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.seg button{background:var(--surface);border:0;border-left:1px solid var(--line);padding:4px 11px;cursor:pointer;font-size:13.5px}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.tools input{padding:5px 9px;border:1px solid var(--line);border-radius:3px;background:var(--surface);min-width:200px}
+.tools .count{margin-left:auto;font-size:13px;color:var(--muted)}
+tr.main{cursor:pointer}
+tr.main:hover td{background:var(--soft)}
+tr.det td{background:var(--soft);font-size:13.5px}
+tr.det ul{margin:2px 0 4px;padding-left:18px}
+.empty{color:var(--muted);font-size:14px;padding:12px 14px}
+.alert{border-left:4px solid var(--c);padding:8px 12px;margin:0 0 8px;background:var(--soft);border-radius:2px}
+.alert b{display:block}
+.alert span{font-size:13.5px;color:var(--muted)}
+.a-bad{--c:var(--dr)} .a-warn{--c:var(--da)}
+footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:20px}
+.secure{-webkit-user-select:none;user-select:none}
+.secure input{-webkit-user-select:text;user-select:text}
+@media print{body{display:none!important}}
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <form class="gcard" id="login" autocomplete="off" novalidate>
+    <div class="kick">Restricted: customer data</div>
+    <h1>User Data and Patterns</h1>
+    <p>Customer history is a separate permission from the fraud console. Sign in again and record why you need access.</p>
+    <label for="emp-id">Employee ID</label><input id="emp-id" autocomplete="off" spellcheck="false">
+    <label for="emp-pw">Password</label><input id="emp-pw" type="password" autocomplete="off">
+    <label for="emp-why">Reason for access</label>
+    <select id="emp-why"><option value="">Choose a reason…</option><option>Reviewing an open wire case</option><option>Customer called about a wire</option><option>Confirmed fraud follow-up</option><option>Quality or model review</option></select>
+    <p class="gerr" id="emp-err" hidden></p>
+    <button type="submit">Sign in to customer data</button>
+    <small>Demo access: <b>MCB-2041</b> / <b>meridian-demo</b>. Simulated in the browser; not real security. Every view is logged with the reason given. This page can’t be copied, downloaded, or printed, and you’ll need to sign in again each time it opens.</small>
+  </form>
+</div>
+
+<div id="app" class="secure" hidden>
+  <header class="top"><div class="in">
+    <div class="logo"><svg width="24" height="24" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M7 19 L11 9 L14 16 L17 9 L21 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg><span>MERIDIAN<small>CUSTOMER REVIEW</small></span></div>
+    <div class="who"><span id="who"></span><button type="button" id="signout">Sign out</button></div>
+  </div></header>
+  <div class="reasonbar"><div class="in" id="reason"></div></div>
+  <main id="main"></main>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script src="customer_report.js"></script>
+<script>
+(function(){
+const R = window.CUSTOMER_REPORT;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const usd = x => '$' + Math.round(x).toLocaleString('en-US');
+const usd2 = x => '$' + (+x).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct = x => Math.round(x*100) + '%';
+const LANE = {release:'Release', confirm:'Confirm', hold:'Hold'};
+const dt = s => new Date(s);
+const dfmt = s => dt(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const tfmt = s => dt(s).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+const hr = h => (h%12||12) + (h<12?' a.m.':' p.m.');
+const SESSION_KEY = 'meridian-demo-session';
+let filter = 'all', query = '', open = null, emp = null, why = '';
+
+function sessionWires(){
+  try { const v = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); return v && Array.isArray(v.wires) ? v.wires : []; }
+  catch(e){ return []; }
+}
+
+// ---- tooltip ----
+const tip = $('tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if(!t){ tip.hidden = true; return; }
+  tip.innerHTML = t.getAttribute('data-tip'); tip.hidden = false;
+  const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8), y = e.clientY + 14 + tip.offsetHeight > innerHeight ? e.clientY - tip.offsetHeight - 10 : e.clientY + 14;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+});
+
+function render(){
+  if(!R){ $('main').innerHTML = '<p>Customer data not found. Run <code>python -m ml.train</code> then <code>python -m ml.customer_report</code>.</p>'; return; }
+  const C = R.customer, T = R.transactions;
+  const legit = T.filter(t => !t.fraud), fraud = T.filter(t => t.fraud);
+  const sorted = [...legit].map(t=>t.amount).sort((a,b)=>a-b), median = sorted[Math.floor(sorted.length/2)] || 0;
+  const total = legit.reduce((a,t)=>a+t.amount,0);
+  const first = dt(T[0].time), last = dt(T[T.length-1].time);
+  const months = Math.max(1, (last - first) / (30.4*864e5));
+  const released = T.filter(t=>t.lane==='release').length;
+  const payees = {};
+  legit.forEach(t => { const p = payees[t.payee] ||= {n:0,sum:0,last:t.time,first:t.time}; p.n++; p.sum+=t.amount; p.last=t.time; });
+  const top = Object.entries(payees).sort((a,b)=>b[1].n-a[1].n);
+  const regular = top.filter(([,p])=>p.n>=3);
+  const inHours = legit.filter(t => { const h = dt(t.time).getHours(); return h>=C.hours[0] && h<C.hours[1]; }).length;
+  const newDev = legit.filter(t=>t.newDevice).length;
+  const blocked = fraud.filter(t=>/Blocked/.test(t.outcome)).length;
+
+  // ---- profile + KPIs ----
+  const prof = `<div class="box"><div class="prof">
+      <div><span>Customer</span><b class="nm">${esc(C.name)}</b><span class="mono">${esc(C.id)}</span> · <span>${esc(C.segment)}, customer since ${esc(C.since)}</span></div>
+      <div><span>Accounts</span><b>${C.accounts.map(esc).join('<br>')}</b></div>
+      <div><span>Usual wire</span><b>${usd(C.usualWire)}</b></div>
+      <div><span>Usual hours</span><b>${hr(C.hours[0])} to ${hr(C.hours[1])}</b></div>
+      <div><span>Debt-to-income</span><b>${pct(C.debtToIncome)}</b></div>
+    </div></div>
+    <div class="box"><div class="kpis">
+      <div><b>${T.length}</b><span>wires, ${dfmt(T[0].time)} to ${dfmt(T[T.length-1].time)}</span></div>
+      <div><b>${usd(total)}</b><span>sent to legitimate payees</span></div>
+      <div><b>${usd(median)}</b><span>median wire</span></div>
+      <div><b>${pct(released/T.length)}</b><span>released automatically</span></div>
+      <div><b>${blocked} of ${fraud.length}</b><span>fraud attempts blocked</span></div>
+    </div></div>`;
+
+  // ---- analysis ----
+  const big = legit.filter(t=>t.ratio>=4);
+  const analysis = `<div class="box"><h2>Pattern summary <span>Generated from this customer’s history and model ${esc(R.modelVersion)}</span></h2><div class="bd"><ul class="summary">
+      <li><b>Steady, predictable sender.</b> About ${(legit.length/months).toFixed(1)} legitimate wires a month, usually around ${usd(median)}.</li>
+      <li><b>Pays a small circle of payees.</b> ${regular.length} regular payees receive ${pct(regular.reduce((a,[,p])=>a+p.n,0)/legit.length)} of wires; the top three are ${top.slice(0,3).map(([n])=>esc(n)).join(', ')}.</li>
+      <li><b>Business-hours habit.</b> ${pct(inHours/legit.length)} of legitimate wires are sent between ${hr(C.hours[0])} and ${hr(C.hours[1])}, from a known device ${pct(1-newDev/legit.length)} of the time.</li>
+      <li><b>Occasional large one-offs.</b> ${big.length} legitimate wire${big.length===1?' was':'s were'} 4× or more the usual amount, mostly to new suppliers; these are the wires most likely to get a passkey check.</li>
+      <li><b>Targeted ${fraud.length} time${fraud.length===1?'':'s'}.</b> ${fraud.length?`Attempts were ${[...new Set(fraud.map(t=>t.fraud.toLowerCase()))].join(', ')}, all to brand-new payees and far from this customer’s usual pattern. ${blocked} were blocked before money left the account.`:'No fraud attempts in this period.'}</li>
+    </ul></div></div>`;
+
+  // ---- charts ----
+  const charts = `<div class="grid2">
+      <div class="box"><h2>Wires per month <span>Legitimate wires; hover for totals</span></h2><div class="bd">${monthChart(legit)}</div></div>
+      <div class="box"><h2>Time of day sent <span>Shaded: usual hours</span></h2><div class="bd">${hourChart(legit, fraud, C.hours)}</div></div>
+    </div>
+    <div class="box"><h2>Risk score of every wire <span>Each dot is a wire; hover for details</span></h2><div class="bd">
+      <div class="legend"><span><i style="background:var(--dg)"></i>Release</span><span><i style="background:var(--da)"></i>Confirm</span><span><i style="background:var(--dr)"></i>Hold</span><span><i style="background:none;border:2px solid var(--ink)"></i>Ringed: confirmed fraud</span></div>
+      ${scoreChart(T)}</div></div>`;
+
+  // ---- payees + alerts ----
+  const flagged = T.filter(t=>t.lane!=='release').slice().reverse();
+  const side = `<div class="grid3">
+      <div class="box"><h2>Payees <span>${top.length} legitimate payees</span></h2><div class="tbl"><table>
+        <thead><tr><th>Payee</th><th class="r">Wires</th><th class="r">Total</th><th class="r">Typical</th><th>Last paid</th></tr></thead>
+        <tbody>${top.slice(0,10).map(([n,p])=>`<tr><td>${esc(n)}</td><td class="r">${p.n}</td><td class="r">${usd(p.sum)}</td><td class="r">${usd(p.sum/p.n)}</td><td>${dfmt(p.last)}</td></tr>`).join('')}</tbody></table></div>
+        ${top.length>10?`<p class="empty" style="padding-top:0">Plus ${top.length-10} payees paid once or twice.</p>`:''}</div>
+      <div class="box"><h2>Flags and alerts <span>${flagged.length} wires not released automatically</span></h2><div class="bd">
+        ${flagged.slice(0,8).map(t=>`<div class="alert ${t.fraud?'a-bad':'a-warn'}"><b>${dfmt(t.time)}: ${usd(t.amount)} to ${esc(t.payee)}</b>
+          <span>${LANE[t.lane]} lane, score ${t.score.toFixed(2)}. ${esc(t.outcome)}${t.fraud?` (${esc(t.fraud.toLowerCase())})`:''}.${t.reasons.length?' '+esc(t.reasons[0])+'.':t.channel==='voice'?' Requested by phone, so confirmed in the app.':''}</span></div>`).join('')}
+        ${flagged.length>8?`<p class="empty" style="padding:0">${flagged.length-8} more in the transaction list.</p>`:''}</div></div>
+    </div>`;
+
+  // ---- session wires ----
+  const S = sessionWires();
+  const session = `<div class="box"><h2>Today, from the live demo <span>${S.length?`${S.length} wire${S.length===1?'':'s'} sent in the demo window`:'Updates as wires are sent in the demo'}</span></h2>
+      ${S.length?`<div class="tbl"><table><thead><tr><th>Case</th><th>Time</th><th>Payee</th><th class="r">Amount</th><th>Channel</th><th class="r">Score</th><th>Lane</th><th>Status</th></tr></thead><tbody>
+        ${S.slice().reverse().map(w=>`<tr><td class="mono">${esc(w.id)}</td><td>${esc(w.at)}</td><td>${esc(w.payee)}</td><td class="r">${usd2(w.amount)}</td><td>${w.channel==='voice'?'Phone':'Online'}</td><td class="r">${w.score==null?'–':w.score.toFixed(2)}</td><td>${w.lane?`<span class="tag t-${w.lane}">${LANE[w.lane]}</span>`:''}</td><td>${esc(w.status)}</td></tr>`).join('')}
+      </tbody></table></div>`:'<p class="empty">No wires sent yet in this browser. Send one from the demo’s customer side and it appears here.</p>'}</div>`;
+
+  $('main').innerHTML = prof + analysis + charts + side + session +
+    `<div class="box" id="txbox"><h2>All wires <span>Click a row for the model’s reasons</span></h2>
+      <div class="tools"><div class="seg" role="group" aria-label="Filter">
+        <button type="button" data-f="all">All</button><button type="button" data-f="flagged">Flagged</button><button type="button" data-f="fraud">Fraud</button><button type="button" data-f="phone">Phone</button></div>
+        <input id="q" type="search" placeholder="Search payee" aria-label="Search payee" value="${esc(query)}"><span class="count" id="count"></span></div>
+      <div class="tbl"><table><thead><tr><th>Date</th><th>Time</th><th>Payee</th><th class="r">Amount</th><th class="r">× usual</th><th>Channel</th><th class="r">Score</th><th>Lane</th><th>Outcome</th></tr></thead><tbody id="txb"></tbody></table></div></div>
+    <footer>View only. Synthetic customer history, scored by model ${esc(R.modelVersion)}. Access by ${esc(emp)} logged with reason “${esc(why)}”. This page can’t be copied, downloaded, or printed.</footer>`;
+  renderTx();
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; open = null; renderTx(); });
+  $('q').oninput = e => { query = e.target.value; open = null; renderTx(); };
+}
+
+function renderTx(){
+  const T = R.transactions.slice().reverse();
+  const q = query.trim().toLowerCase();
+  const rows = T.filter(t => (filter==='all' || (filter==='flagged' && t.lane!=='release') || (filter==='fraud' && t.fraud) || (filter==='phone' && t.channel==='voice'))
+    && (!q || t.payee.toLowerCase().includes(q)));
+  document.querySelectorAll('[data-f]').forEach(b => b.setAttribute('aria-pressed', b.dataset.f===filter));
+  $('count').textContent = `${rows.length} of ${T.length} wires`;
+  $('txb').innerHTML = rows.length ? rows.map(t => {
+    const flags = [t.newDevice&&'New device', t.offHours&&'Off hours', t.firstPayee&&'First wire to payee'].filter(Boolean);
+    const bad = /Blocked|reported/.test(t.outcome);
+    return `<tr class="main" data-id="${t.id}" tabindex="0" aria-expanded="${open===t.id}"><td>${dfmt(t.time)}</td><td>${tfmt(t.time)}</td><td>${esc(t.payee)}${flags.length?`<br>${flags.map(f=>`<span class="fl">${f}</span>`).join('')}`:''}</td>
+      <td class="r">${usd2(t.amount)}</td><td class="r">${t.ratio.toFixed(1)}×</td><td>${t.channel==='voice'?'Phone':t.channel==='branch'?'Branch':'Online'}</td>
+      <td class="r mono">${t.score<.01?t.score.toFixed(3):t.score.toFixed(2)}</td><td><span class="tag t-${t.lane}">${LANE[t.lane]}</span></td>
+      <td class="${bad?'out-bad':''}">${esc(t.outcome)}${t.fraud?`<br><span style="font-weight:400">${esc(t.fraud)}</span>`:''}</td></tr>
+      ${open===t.id?`<tr class="det"><td colspan="9">${t.reasons.length?`<b>Why the model flagged it</b><ul>${t.reasons.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:t.channel==='voice'&&t.lane==='confirm'?'Low score, but phone requests always go to Confirm.':'Nothing in this wire was riskier than this customer’s normal pattern, so it was released automatically.'}</td></tr>`:''}`;
+  }).join('') : '<tr><td colspan="9" class="empty">No wires match.</td></tr>';
+  $('txb').querySelectorAll('tr.main').forEach(tr => {
+    const go = () => { open = open===tr.dataset.id ? null : tr.dataset.id; renderTx(); };
+    tr.onclick = go; tr.onkeydown = e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } };
+  });
+}
+
+// ---- charts (inline SVG) ----
+function axisY(max, x0, x1, y, h, fmt){
+  return [0,.5,1].map(f => { const yy = y + h - f*h; return `<line class="grid" x1="${x0}" x2="${x1}" y1="${yy}" y2="${yy}"/><text x="${x0-6}" y="${yy+3.5}" text-anchor="end">${fmt(max*f)}</text>`; }).join('');
+}
+function monthChart(L){
+  const m = {}; L.forEach(t => { const k = t.time.slice(0,7); (m[k] ||= {n:0,sum:0}); m[k].n++; m[k].sum += t.amount; });
+  const keys = Object.keys(m).sort(), W = 520, H = 200, x0 = 34, y0 = 10, h = 150, bw = (W - x0 - 10) / keys.length;
+  const max = Math.ceil(Math.max(...keys.map(k=>m[k].n)) / 4) * 4;
+  const lab = k => new Date(k + '-15').toLocaleDateString('en-US',{month:'short'});
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="Legitimate wires per month">${axisY(max,x0,W-10,y0,h,v=>Math.round(v))}
+    ${keys.map((k,i) => { const v = m[k].n, bh = v/max*h, x = x0 + i*bw + bw*.22, w = bw*.56, y = y0+h-bh;
+      return `<g data-tip="<b>${lab(k)} ${k.slice(0,4)}</b><br>${v} wires · ${usd(m[k].sum)}"><rect class="hit" x="${x0+i*bw}" y="${y0}" width="${bw}" height="${h}"/>
+        <path d="M${x},${y0+h} V${y+4} Q${x},${y} ${x+4},${y} H${x+w-4} Q${x+w},${y} ${x+w},${y+4} V${y0+h} Z" fill="var(--bar)"/>
+        <text x="${x+w/2}" y="${y-5}" text-anchor="middle" style="fill:var(--ink)">${v}</text><text x="${x+w/2}" y="${y0+h+16}" text-anchor="middle">${lab(k)}</text></g>`; }).join('')}</svg>`;
+}
+function hourChart(L, F, hours){
+  const c = Array(24).fill(0); L.forEach(t => c[dt(t.time).getHours()]++);
+  const W = 520, H = 200, x0 = 34, y0 = 10, h = 150, bw = (W - x0 - 10) / 24, max = Math.max(2, Math.ceil(Math.max(...c)/2)*2);
+  const fh = F.map(t => dt(t.time).getHours());
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="Wires by hour of day">
+    <rect x="${x0+hours[0]*bw}" y="${y0}" width="${(hours[1]-hours[0])*bw}" height="${h}" fill="var(--band)"/>${axisY(max,x0,W-10,y0,h,v=>Math.round(v))}
+    ${c.map((v,i) => { const bh = v/max*h, x = x0+i*bw+1, w = bw-2, y = y0+h-bh, nf = fh.filter(x=>x===i).length;
+      return `<g data-tip="<b>${hr(i)}</b><br>${v} legitimate wire${v===1?'':'s'}${nf?`<br>${nf} fraud attempt${nf>1?'s':''}`:''}"><rect class="hit" x="${x0+i*bw}" y="${y0}" width="${bw}" height="${h}"/>
+        ${v?`<path d="M${x},${y0+h} V${y+Math.min(3,bh)} Q${x},${y} ${x+Math.min(3,w/2)},${y} H${x+w-Math.min(3,w/2)} Q${x+w},${y} ${x+w},${y+Math.min(3,bh)} V${y0+h} Z" fill="var(--bar)"/>`:''}
+        ${nf?`<circle cx="${x+w/2}" cy="${y0+h-bh-9}" r="4.5" fill="var(--dr)" stroke="var(--surface)" stroke-width="2"/>`:''}
+        ${i%3===0?`<text x="${x0+i*bw+bw/2}" y="${y0+h+16}" text-anchor="middle">${i===0?'12a':i<12?i+'a':i===12?'12p':(i-12)+'p'}</text>`:''}</g>`; }).join('')}</svg>
+    <div class="legend" style="margin:4px 0 0"><span><i class="sq" style="background:var(--bar)"></i>Legitimate wires</span><span><i style="background:var(--dr)"></i>Hour a fraud attempt was sent</span></div>`;
+}
+function scoreChart(T){
+  const W = 1100, H = 230, x0 = 40, x1 = W-14, y0 = 12, h = 180, t0 = dt(T[0].time), t1 = dt(T[T.length-1].time);
+  const X = s => x0 + (dt(s)-t0)/(t1-t0) * (x1-x0), Y = v => y0 + h - v*h;
+  const col = {release:'var(--dg)', confirm:'var(--da)', hold:'var(--dr)'};
+  const months = []; const d = new Date(t0.getFullYear(), t0.getMonth()+1, 1); while(d <= t1){ months.push(new Date(d)); d.setMonth(d.getMonth()+1); }
+  const th = R.thresholds;
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="Risk score of each wire over time">
+    ${[0,.5,1].map(v=>`<line class="grid" x1="${x0}" x2="${x1}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${x0-6}" y="${Y(v)+3.5}" text-anchor="end">${v}</text>`).join('')}
+    ${[['release',th.release],['hold',th.hold]].map(([k,v])=>`<line x1="${x0}" x2="${x1}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="${x0+4}" y="${Y(v)-4}" text-anchor="start" style="paint-order:stroke;stroke:var(--surface);stroke-width:3px">${k==='release'?'Confirm above '+v:'Hold above '+v}</text>`).join('')}
+    ${months.map(m=>`<text x="${X(m.toISOString())}" y="${y0+h+18}" text-anchor="middle">${m.toLocaleDateString('en-US',{month:'short'})}</text>`).join('')}
+    ${T.map(t=>`<g data-tip="<b>${dfmt(t.time)}</b> · ${esc(t.payee)}<br>${usd(t.amount)} · score ${t.score.toFixed(2)} · ${LANE[t.lane]}<br>${esc(t.outcome)}${t.fraud?' ('+esc(t.fraud)+')':''}">
+      <circle cx="${X(t.time)}" cy="${Y(t.score)}" r="11" class="hit"/>
+      <circle cx="${X(t.time)}" cy="${Y(t.score)}" r="5" fill="${col[t.lane]}" stroke="${t.fraud?'var(--ink)':'var(--surface)'}" stroke-width="${t.fraud?2.5:1.5}"/></g>`).join('')}</svg>`;
+}
+
+// ---- separate sign-in (browser only, not real security) ----
+const EMP = {'MCB-2041': {pw:'meridian-demo', role:'Fraud Analyst'}};
+let idle = null;
+function signIn(id, reason){
+  emp = id; why = reason; $('gate').hidden = true; $('app').hidden = false;
+  $('who').textContent = `${EMP[id].role} (${id})`;
+  $('reason').textContent = `Customer data access logged ${new Date().toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})}. Reason: ${reason}.`;
+  render(); resetIdle();
+}
+function signOut(msg){
+  emp = null; why = ''; $('app').hidden = true; $('main').innerHTML = ''; $('gate').hidden = false; $('emp-pw').value = ''; $('emp-why').value = '';
+  $('emp-err').hidden = !msg; if(msg) $('emp-err').textContent = msg; clearTimeout(idle);
+}
+function resetIdle(){ clearTimeout(idle); if(emp) idle = setTimeout(() => signOut('Signed out after 10 minutes of inactivity.'), 10*60*1000); }
+$('login').addEventListener('submit', e => {
+  e.preventDefault(); const id = $('emp-id').value.trim().toUpperCase(), reason = $('emp-why').value;
+  if(!(EMP[id] && EMP[id].pw === $('emp-pw').value)){ $('emp-err').hidden = false; $('emp-err').textContent = 'Employee ID or password is incorrect.'; return; }
+  if(!reason){ $('emp-err').hidden = false; $('emp-err').textContent = 'Choose a reason for access. Every view of customer data is logged.'; return; }
+  signIn(id, reason);
+});
+$('signout').onclick = () => signOut('');
+['click','keydown','scroll'].forEach(ev => document.addEventListener(ev, resetIdle, true));
+['copy','cut','contextmenu','dragstart'].forEach(ev => $('app').addEventListener(ev, e => { if(!e.target.closest('input')) e.preventDefault(); }));
+window.addEventListener('beforeprint', () => { if(emp) signOut('Signed out: printing customer data isn’t allowed.'); });
+window.addEventListener('storage', e => { if(e.key === SESSION_KEY && emp){ const f = filter, q = query; render(); filter = f; query = q; } });
+})();
+</script>
+</body>
+</html>

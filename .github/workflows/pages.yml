@@ -29,6 +29,8 @@ jobs:
         run: python -m ml.train --regenerate
       - name: Build the Model & data page
         run: python -m ml.report
+      - name: Build the User Data and Patterns page
+        run: python -m ml.customer_report
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

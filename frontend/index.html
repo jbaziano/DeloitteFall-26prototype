@@ -265,6 +265,8 @@ html:root:root{--d-bg:#24282C;--d-ink:#E7E9EB;--d-line:#4A5157}
 .ehead h2{font-size:15px;font-weight:600}
 .ehead .ewho{color:#C9D2F0}
 .ehead .ebtn.sm{border-color:rgba(255,255,255,.45);color:#fff}
+.ehead .udp{text-decoration:none;background:#fff;color:#1B2453!important;border-color:#fff!important;font-weight:600}
+.ehead .ewho{flex-wrap:wrap}
 .emain>.ebox,.emain>.empty,.emain>p{margin-left:12px;margin-right:12px}
 .ebox{border-radius:3px;padding:10px 14px 12px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .ebox h3{background:var(--e-head);border-bottom:1px solid var(--e-line);margin:-10px -14px 10px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--e-ink);text-transform:none;letter-spacing:0;border-radius:3px 3px 0 0}
@@ -398,10 +400,10 @@ async function apiPost(path,body){const r=await fetch(API+path,{method:'POST',he
 const CUSTOMER='Prairie Ridge Farms';
 const ACCOUNTS=[{id:'op',name:'Business Operating',mask:'4821',bal:284310.55},{id:'pay',name:'Payroll',mask:'7730',bal:61204.18}];
 const PAYEES=[
-  {id:'midstate',name:'Midstate Steel Supply',bank:'First Merchants Bank',mask:'3391',country:'United States',age:1460,senders:2,bankchg:false,first:false,last:'Oct 2, 2026'},
+  {id:'midstate',name:'Midstate Steel Supply',bank:'First Merchants Bank',mask:'3391',country:'United States',age:1460,senders:2,bankchg:false,first:false,last:'Oct 27, 2026'},
   {id:'granite',name:'Granite Point Consulting',bank:'Metro Credit Union',mask:'9914',country:'United States',age:21,senders:3,bankchg:true,first:false,last:'Sep 18, 2026',note:'Bank details updated Oct 28'},
   {id:'heartland',name:'Heartland Title & Escrow',bank:'Old National Bank',mask:'0187',country:'United States',age:2900,senders:18,bankchg:false,first:true,last:null},
-  {id:'coleman',name:'Robin Theodore Coleman',bank:'Huntington National Bank',mask:'5562',country:'United States',age:3100,senders:1,bankchg:false,first:false,last:'Aug 29, 2026'},
+  {id:'coleman',name:'Robin Theodore Coleman',bank:'Huntington National Bank',mask:'5562',country:'United States',age:3100,senders:1,bankchg:false,first:false,last:'Oct 19, 2026'},
 ];
 const COUNTRIES=['United States','Canada','Mexico','United Kingdom','Hong Kong','United Arab Emirates','Nigeria'];
 const CLEAN={usual:9000,off:false,debt:.30,newip:false,typing:.12,remote:false,sim:false,mule:false,contact:false,newAge:12,newSenders:2};
@@ -645,7 +647,7 @@ function renderEmp(){
     return; }
   const c=S.cases.find(x=>x.id===S.sel)||S.cases[0];
   box.innerHTML=`<div class="emain">
-    <div class="ehead"><h2>Wire monitoring</h2><div class="ewho"><span>${esc(S.emp.role)} (${S.emp.id})</span><button class="ebtn sm" data-e="signout">Sign out</button></div></div>
+    <div class="ehead"><h2>Wire monitoring</h2><div class="ewho"><a class="ebtn sm udp" href="customer.html" target="_blank">User Data and Patterns</a><span>${esc(S.emp.role)} (${S.emp.id})</span><button class="ebtn sm" data-e="signout">Sign out</button></div></div>
     ${c?caseView(c):`<div class="empty">No wires yet today.<br>When the customer presses Send, the wire appears here with its score.</div>`}
     ${S.cases.length>1?`<div class="ebox"><h3>Today’s wires</h3><table class="hist"><tbody>${S.cases.map(x=>`<tr data-sel="${x.id}" aria-current="${c&&x.id===c.id}"><td><b>${x.id}</b><div class="esmall">${x.at}</div></td><td>${esc(x.w.payee)}<div class="esmall">${usd0(x.w.amount)}${x.w.channel==='voice'?', phone':''}</div></td><td class="r"><span class="lane ${x.lane}" style="font-size:13.5px">${!x.result?'':x.result.score.toFixed(2)+' '+LN[x.lane]}</span><div>${statusPill(x)}</div></td></tr>`).join('')}</tbody></table></div>`:''}
     <div class="ebox"><h3>Model</h3><p class="esmall" style="margin:0 0 8px">Version <b>${esc(MODEL.version)}</b>${MODEL.auc?`, held-out AUC ${(+MODEL.auc).toFixed(3)}`:''}. ${API?`Scoring via API at ${esc(API)}. Analyst decisions are saved as labels${MODEL.labels?` (${MODEL.labels} so far)`:''}.`:'Scoring in this browser with the trained weights. Run the API (see README) to save analyst labels and retrain.'}</p>
@@ -715,7 +717,13 @@ function showPane(w){$('tab-c').setAttribute('aria-selected',w==='c'); $('tab-e'
   else {$('pane-e').removeAttribute('data-hide-mobile'); $('pane-c').setAttribute('data-hide-mobile','');}}
 $('tab-c').onclick=()=>showPane('c'); $('tab-e').onclick=()=>showPane('e');
 
-function renderAll(){renderCust(); renderEmp(); renderPreview();}
+function renderAll(){renderCust(); renderEmp(); renderPreview(); shareSession();}
+// Hand today's demo wires to the User Data and Patterns page (same browser only).
+function shareSession(){
+  try{ localStorage.setItem('meridian-demo-session',JSON.stringify({updated:Date.now(),wires:S.cases.map(c=>({id:c.id,at:c.at,payee:c.w.payee,amount:c.w.amount,channel:c.w.channel,
+    score:c.result?c.result.score:null,lane:c.result?c.lane:null,
+    status:{sent:'Sent',blocked:'Blocked',cancelled:'Cancelled',error:'Not scored',scoring:'Scoring',staff:'Waiting on staff',cust:'Waiting on customer'}[c.status]||c.status}))})); }catch(e){}
+}
 bindControls(); syncBen(); fillSignals(); renderAll();
 if(API) fetch(API+'/model').then(r=>r.json()).then(j=>{MODEL.version=j.version; MODEL.auc=j.testMetrics&&j.testMetrics.auc; renderAll();})
   .catch(()=>{$('preview').innerHTML+=' <b style="color:var(--r)">API not reachable</b>';});

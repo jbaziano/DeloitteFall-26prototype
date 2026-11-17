@@ -22,6 +22,8 @@ jobs:
         run: python -m ml.train --regenerate
       - name: Build the Model & data page
         run: python -m ml.report
+      - name: Build the User Data and Patterns page
+        run: python -m ml.customer_report
       - name: Run tests
         run: pytest -q
       - name: Keep model metrics and weights (no data)

@@ -149,3 +149,15 @@ def test_model_report_has_summaries_only(trained, tmp_path):
     assert sum(h["legit"] + h["fraud"] for h in r["histogram"]) == r["split"]["test"]
     text = (tmp_path / "model_report.js").read_text()
     assert "customer_id" not in text and "beneficiary_account" not in text   # no identifiers, summaries only
+
+
+def test_customer_report_scores_full_history(trained, tmp_path):
+    from ml.customer_report import build
+    base, _ = trained
+    r = build(data_dir=base / "data", artifacts=base / "artifacts", frontend=tmp_path)
+    tx = r["transactions"]
+    assert r["customer"]["name"] == "Prairie Ridge Farms" and len(tx) >= 40
+    assert any(t["fraud"] for t in tx) and all(t["lane"] in ("release", "confirm", "hold") for t in tx)
+    assert all(t["lane"] == "confirm" for t in tx if t["channel"] == "voice")      # voice policy applied
+    text = (tmp_path / "customer_report.js").read_text()
+    assert "beneficiary_account" not in text and "C1" not in r["customer"]["id"]

@@ -154,7 +154,7 @@ footer{font-size:13px;color:var(--muted);margin-top:44px;border-top:1px solid va
 .gerr{color:var(--r);font-size:13.5px;margin:8px 0 0}
 .gcard small{display:block;color:var(--muted);font-size:12.5px;margin-top:14px}
 .secure{-webkit-user-select:none;user-select:none}
-@media print{body{display:none!important}}
+
 
 /* ---------- report styling overrides (presentation only) ---------- */
 body{font-family:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15.5px}
@@ -191,23 +191,10 @@ footer{border-top:2px solid var(--ink)}
 </style>
 </head>
 <body>
-<div class="gate" id="gate">
-  <form class="gcard" id="login" autocomplete="off" novalidate>
-    <h1>Meridian employee sign-in</h1>
-    <p>Model and training data are restricted to authorized fraud and model-risk staff.</p>
-    <label for="emp-id">Employee ID</label><input id="emp-id" autocomplete="off" spellcheck="false">
-    <label for="emp-pw">Password</label><input id="emp-pw" type="password" autocomplete="off">
-    <p class="gerr" id="emp-err" hidden></p>
-    <button type="submit">Sign in</button>
-    <small>Demo access: <b>MCB-2041</b> / <b>meridian-demo</b>. Simulated in the browser; not real security. This page shows summaries only and can’t be copied, downloaded, or printed.</small>
-  </form>
-</div>
-
-<div id="app" class="secure" hidden>
+<div id="app">
   <header class="top"><div class="in">
     <div class="logo"><svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M7 19 L11 9 L14 16 L17 9 L21 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg><span>MERIDIAN<small>FRAUD OPERATIONS</small></span></div>
     <nav class="tnav" aria-label="Views"><a href="index.html">Wire demo</a><a href="model.html" aria-current="page">Model &amp; data</a></nav>
-    <div class="who"><span id="emp-who"></span><button type="button" id="signout">Sign out</button></div>
   </div></header>
 
   <main id="main"></main>
@@ -365,7 +352,7 @@ function render(){
       <div class="kpi"><b>${pct(plAcc,1)}</b><span>Self-made labels that were correct</span><em>${n(ST.pseudo_labeled)} wires learned without answers</em></div>
     </div>
     ${s1}${s2}${s3}${s4}${s5}${s6}
-    <footer>View only. This page shows summaries of synthetic data; it can’t be copied, downloaded, or printed. Regenerate with <code>python -m ml.train</code> and <code>python -m ml.report</code>.</footer>`;
+    <footer>Summaries of synthetic data only. Regenerate with <code>python -m ml.train</code> and <code>python -m ml.report</code>.</footer>`;
 }
 
 function roc(){
@@ -385,18 +372,7 @@ function roc(){
   </svg>`;
 }
 
-// ---- simulated employee sign-in (browser only, not real security) ----
-const EMP={'MCB-2041':{pw:'meridian-demo',role:'Fraud Analyst'}};
-let idle=null, signedIn=false;
-function signIn(id){signedIn=true; $('gate').hidden=true; $('app').hidden=false; $('emp-who').textContent=`${EMP[id].role} (${id})`; render(); resetIdle();}
-function signOut(msg){signedIn=false; $('app').hidden=true; $('main').innerHTML=''; $('gate').hidden=false; $('emp-pw').value=''; $('emp-err').hidden=!msg; if(msg) $('emp-err').textContent=msg; clearTimeout(idle);}
-function resetIdle(){clearTimeout(idle); if(signedIn) idle=setTimeout(()=>signOut('Signed out after 10 minutes of inactivity.'),10*60*1000);}
-$('login').addEventListener('submit',e=>{e.preventDefault(); const id=$('emp-id').value.trim().toUpperCase();
-  if(EMP[id]&&EMP[id].pw===$('emp-pw').value) signIn(id); else {$('emp-err').hidden=false; $('emp-err').textContent='Employee ID or password is incorrect.';}});
-$('signout').onclick=()=>signOut('');
-['click','keydown','scroll'].forEach(ev=>document.addEventListener(ev,resetIdle,true));
-['copy','cut','contextmenu','dragstart'].forEach(ev=>$('app').addEventListener(ev,e=>e.preventDefault()));
-window.addEventListener('beforeprint',()=>{if(signedIn) signOut('Signed out: printing model data isn’t allowed.');});
+render();
 })();
 </script>
 </body>
